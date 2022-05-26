@@ -1,10 +1,11 @@
+import sys
 import ply.yacc as yacc
 from tree import Node
 
 # Get the token map from the lexer.
 from lexer import tokens
 
-start = 'expression'
+start = 'program'
 
 precedence = (
      ('left', 'OR'),
@@ -228,7 +229,7 @@ def p_atom_expression(p):
 
 def p_atom_call(p):
     '''atom : call'''
-    p[0] = Node('CallAtom', 'callAtom', [p[1]])    
+    p[0] = Node('CallAtom', 'callAtom', [p[1]])
 
 #=========== Expression ================
 def p_expression_atom(p):
@@ -279,7 +280,7 @@ def p_expression_bool_const(p):
                   | FALSE
                   '''
     p[0] = Node('bool_const', p[1])
-    
+
 def p_expression_not(p):
     '''expression : NOT expression'''
     p[0] = Node('NotExpr', 'not', [p[2]])
@@ -289,7 +290,7 @@ def p_expression_binary_boolean(p):
                   | expression OR expression
                   '''
     p[0] = Node('BinBoolExpr', p[2], [p[1], p[3]])
-    
+
 def p_expression_new(p):
     '''expression : NEW type LBRACKET expression RBRACKET'''
     p[0] = Node('NewExpr', p[1], [p[2], p[4]])
@@ -335,11 +336,10 @@ def p_error(p):
 # Build the parser
 parser = yacc.yacc()
 
-while True:
-    try:
-        s = input('calc > ')
-    except EOFError:
-        break
-    if not s: continue
-    result = parser.parse(s)
-    print(result)
+file = sys.argv[1]
+print(file)
+
+with open(file, 'r', encoding='unicode_escape') as f:
+    s = f.read()
+    print(s)
+    print(parser.parse(s, debug=1))

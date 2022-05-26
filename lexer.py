@@ -1,3 +1,4 @@
+import sys
 import ply.lex as lex
 
 # Declare the state
@@ -76,7 +77,7 @@ def t_NIL2(t):
 # Numbers
 def t_NUMBER(t):
     r'\d+'
-    t.value = int(t.value)    
+    t.value = int(t.value)
     return t
 
 # Symbolic operators
@@ -159,12 +160,20 @@ def t_error(t):
 lexer = lex.lex() # Use parameter debug=1 to debug
 
 # input = '''
-#         x
-        
+#         def hello ():
+#           puts("Hello world!\n")
+#         end
 #         '''
 # print(input)
-# lexer.input(input)
-
+# file = sys.argv[1]
+# print(file)
+#
+# with open(file, 'r', encoding='unicode_escape') as f:
+#     s = f.read()
+#
+# print(s)
+# lexer.input(s)
+#
 # # Tokenize
 # while True:
 #     tok = lexer.token()

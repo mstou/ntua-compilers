@@ -11,7 +11,7 @@ def output(lexer, input):
     # Tokenize
     while True:
         tok = lexer.token()
-        if not tok: 
+        if not tok:
             break      # No more input
         tokens.append((tok.type, tok.value))
     return tokens
@@ -81,7 +81,7 @@ class TestLexer(unittest.TestCase):
 
         ]
         self.assertEqual(tokens, expectedTokens)
-    
+
     def test_string(self):
         input = '''
             "One must imagine"
@@ -146,7 +146,7 @@ class TestLexer(unittest.TestCase):
             ('NAME', 'y_Underscore_')
         ]
         self.assertEqual(tokens, expectedTokens)
-        
+
     def test_singleLineComments(self):
         input = '''
             % This is a comment
@@ -155,7 +155,7 @@ class TestLexer(unittest.TestCase):
         tokens = output(lexer, input)
         expectedTokens = []
         self.assertEqual(tokens, expectedTokens)
-        
+
     def test_multipleLineComments(self):
         input = '''
             <* Comment *>
@@ -166,8 +166,8 @@ class TestLexer(unittest.TestCase):
         tokens = output(lexer, input)
         expectedTokens = []
         self.assertEqual(tokens, expectedTokens)
-        
-    
+
+
     def test_mixed1(self):
         input = '''
             x = 1
@@ -178,10 +178,10 @@ class TestLexer(unittest.TestCase):
         tokens = output(lexer, input)
         expectedTokens = []
         pass
-    
+
     def test_mixed2(self):
         pass
-    
+
     def test_HelloWorld(self):
         input = '''
             def hello ():

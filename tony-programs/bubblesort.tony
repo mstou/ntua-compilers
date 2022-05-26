@@ -28,10 +28,10 @@ def main ():
 
     puts(msg)
     for i := 0; i < n; i := i+1:
-      if i > 0: puts(”, ”) end
+      if i > 0: puts(", ") end
       puti(x[i])
     end
-    puts(”\n”)
+    puts("\n")
   end
 
   int seed, i
@@ -45,8 +45,8 @@ def main ():
     x[i] := seed
   end
 
-  writeArray(”Initial array: ”, 16, x)
+  writeArray("Initial array: ", 16, x)
   bsort(16, x)
-  writeArray(”Sorted array: ”, 16, x)
+  writeArray("Sorted array: ", 16, x)
 
 end

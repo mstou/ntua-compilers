@@ -331,7 +331,7 @@ def p_empty(p):
 
 #================= Error =================
 def p_error(p):
-    print("Syntax error in input!")
+    print('\x1b[0;30;41m' + 'Syntax error in input!' + '\x1b[0m')
 
 # Build the parser
 parser = yacc.yacc()
@@ -341,5 +341,4 @@ print(file)
 
 with open(file, 'r', encoding='unicode_escape') as f:
     s = f.read()
-    print(s)
-    print(parser.parse(s, debug=1))
+    print(parser.parse(s, debug=0))

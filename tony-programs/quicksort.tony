@@ -29,10 +29,10 @@ def main ():
     puts(msg)
 
     for more := false; not nil?(l); l := tail(l), more := true:
-      if more: puts(”, ”) end
+      if more: puts(", ") end
       puti(head(l))
     end
-    puts(”\n”)
+    puts("\n")
   end
 
   int seed, i
@@ -43,7 +43,7 @@ def main ():
     seed := (seed * 137 + 220 + i) mod 101
     l := seed # l
   end
-  writeList(”Initial list: ”, l)
+  writeList("Initial list: ", l)
   l := qsort(l)
-  writeList(”Sorted list: ”, l)
+  writeList("Sorted list: ", l)
 end

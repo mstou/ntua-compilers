@@ -171,7 +171,6 @@ lexer = lex.lex() # Use parameter debug=1 to debug
 # with open(file, 'r', encoding='unicode_escape') as f:
 #     s = f.read()
 #
-# print(s)
 # lexer.input(s)
 #
 # # Tokenize

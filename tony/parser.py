@@ -1,6 +1,6 @@
 import sys
 import ply.yacc as yacc
-from tree import Node
+from abstract_syntax_tree import Node
 
 # Get the token map from the lexer.
 from lexer import tokens
@@ -72,7 +72,7 @@ def p_formallist(p):
     if len(p) == 2:
         p[0] = Node('FormalList', 'formallist', [p[1]])
 
-#=========== Type ================
+# ================ Type ================
 def p_type_simple(p):
     '''type : INT
             | BOOL
@@ -336,9 +336,9 @@ def p_error(p):
 # Build the parser
 parser = yacc.yacc()
 
-file = sys.argv[1]
-print(file)
-
-with open(file, 'r', encoding='unicode_escape') as f:
-    s = f.read()
-    print(parser.parse(s, debug=0))
+# file = sys.argv[1]
+# print(file)
+#
+# with open(file, 'r', encoding='unicode_escape') as f:
+#     s = f.read()
+#     print(parser.parse(s, debug=0))

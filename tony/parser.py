@@ -27,16 +27,21 @@ def p_funcdef(p):
     '''funcdef : DEF header COLON funcdefhelp stmt stmtlist END'''
     p[0] = Node('FuncDef', 'funcdef', [p[2], p[4], p[5], p[6]])
 
-def p_funcdefhelp(p):
-    '''funcdefhelp : funcdef funcdefhelp
-                   | funcdecl funcdefhelp
-                   | vardef funcdefhelp
-                   | empty
-                   '''
-    if len(p) == 3:
-        p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1], p[2]])
-    elif len(p) == 2:
-        p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1]])
+def p_funcdefhelp_funcdef(p):
+    '''funcdefhelp : funcdef funcdefhelp'''
+    p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1],p[2]])
+
+def p_funcdefhelp_funcdecl(p):
+    '''funcdefhelp : funcdecl funcdefhelp'''
+    p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1], p[2]])
+
+def p_funcdefhelp_vardef(p):
+    '''funcdefhelp : vardef funcdefhelp'''
+    p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1], p[2]])
+
+def p_funcdefhelp_empty(p):
+    '''funcdefhelp : empty'''
+    p[0] = None
 
 #=========== Header ==============
 def p_header(p):
@@ -327,7 +332,7 @@ def p_exprcomma(p): # rule to parse: expr (, expr)*
 #================= Empty =================
 def p_empty(p):
     '''empty :'''
-    p[0] = Node('Empty', 'empty')
+    p[0] = None
 
 #================= Error =================
 def p_error(p):

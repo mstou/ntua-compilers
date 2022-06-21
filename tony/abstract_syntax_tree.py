@@ -13,6 +13,16 @@ class Node:
             return_string.extend(["\n", "  " * (depth+1), child.__str__(depth+1)])
         return "".join(return_string)
 
+
+class FuncDef(Node): # function definition
+    def __init__(header, functions, stmt, stmtlist):
+        self.header = header       # type
+        self.functions = functions # type FuncDefHelp
+        self.stmt = stmt           # type Statement
+        self. stmtlist = stmtlist  # type
+
+class FuncDefHelp(Node): pass
+
 #======== Map function =======
 def mapTree(node, f):
     newType = node.type

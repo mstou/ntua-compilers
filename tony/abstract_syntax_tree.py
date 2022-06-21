@@ -40,6 +40,26 @@ class FuncDefHelp_VarDef(FuncDefHelp):
     def __init__(self, d, child):
         super().__init__(d, help)
 
+
+class FunctionHeader(Node):
+    def __init__(self, type, name, formal, formallist):
+        self.type = type
+        self.name = name
+        self.formal = formal
+        self.formallist = formallist
+
+
+class Formal(Node): # variable declaration in function header
+    def __init__(self, vardef, reference):
+        self.reference = reference
+        self.vardef = vardef
+
+class FormalList(Node):
+    def __init__(self, formal, child):
+        self.formal = formal
+        self.child = child
+
+
 #======== Map function =======
 def mapTree(node, f):
     newType = node.type

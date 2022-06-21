@@ -38,7 +38,7 @@ def p_funcdefhelp_funcdecl(p):
 def p_funcdefhelp_vardef(p):
     '''funcdefhelp : vardef funcdefhelp'''
     p[0] = FuncDefHelp_VarDef(p[1], p[2])
-    
+
 def p_funcdefhelp_empty(p):
     '''funcdefhelp : empty'''
     p[0] = None
@@ -50,33 +50,33 @@ def p_header(p):
               | NAME LPAREN formal formallist RPAREN
               | NAME LPAREN RPAREN
               '''
-    if len(p) == 7:
-        p[0] = Node('HeaderWithTypeArgs', 'headerWithTypeArgs' + p[2], [p[1], p[4], p[5]])
-    elif len(p) == 5:
-        p[0] = Node('HeaderWithTypeNoArgs', 'headerWithTypeNoArgs' + p[2], [p[1]])
-    elif len(p) == 6:
-        p[0] = Node('HeaderArgs', 'headerArgs' + p[1], [p[3], p[4]])
-    elif len(p) == 4:
-        p[0] = Node('HeaderNoArgs', 'headerNoArgs' + p[1])
+    if len(p) == 7:    # Rule 1
+        p[0] = FunctionHeader(p[1], p[2], p[4], p[5])
+    elif len(p) == 5:  # Rule 2
+        p[0] = FunctionHeader(p[1], p[2], None, None)
+    elif len(p) == 6:  # Rule 3
+        p[0] = FunctionHeader(None, p[1], p[3], p[4])
+    elif len(p) == 4:  # Rule 4
+        p[0] = FunctionHeader(None, p[1], None, None)
 
 #=========== Formal ==============
 def p_formal(p):
     '''formal : REF vardef
               | vardef'''
     if len(p) == 3:
-        p[0] = Node('RefFormal', 'refFormal', [p[2]])
+        p[0] = Formal(p[2], reference=True)
     elif len(p) == 2:
-        p[0] = Node('Formal', 'formal', [p[1]])
+        p[0] = Formal(p[1], reference=False)
 
 def p_formallist(p):
     '''formallist : SEMICOLON formal formallist
                   | empty
                   '''
     if len(p) == 4:
-        p[0] = Node('FormalList', 'formallist', [p[2], p[3]])
-    if len(p) == 2:
-        p[0] = Node('FormalList', 'formallist', [p[1]])
-
+        p[0] = FormalList(p[2], p[3])
+    elif len(p) == 2:
+        p[0] = FormalList(None, None)
+        
 # ================ Type ================
 def p_type_simple(p):
     '''type : INT

@@ -15,13 +15,30 @@ class Node:
 
 
 class FuncDef(Node): # function definition
-    def __init__(header, functions, stmt, stmtlist):
+    def __init__(self, header, functions, stmt, stmtlist):
         self.header = header       # type
         self.functions = functions # type FuncDefHelp
         self.stmt = stmt           # type Statement
         self. stmtlist = stmtlist  # type
 
-class FuncDefHelp(Node): pass
+class FuncDefHelp(Node): # function definitions recursively
+    def __init__(self, d, child):
+        self.d = d
+        self.child = child
+
+class FuncDefHelp_FuncDecl(FuncDefHelp):
+    def __init__(self, d, child):
+        super().__init__(d, help)
+
+
+class FuncDefHelp_FuncDef(FuncDefHelp):
+    def __init__(self, d, child):
+        super().__init__(d, help)
+
+
+class FuncDefHelp_VarDef(FuncDefHelp):
+    def __init__(self, d, child):
+        super().__init__(d, help)
 
 #======== Map function =======
 def mapTree(node, f):

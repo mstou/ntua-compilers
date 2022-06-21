@@ -1,6 +1,6 @@
 import sys
 import ply.yacc as yacc
-from abstract_syntax_tree import Node
+from abstract_syntax_tree import *
 
 # Get the token map from the lexer.
 from lexer import tokens
@@ -25,20 +25,20 @@ def p_program(p):
 #======== Function definition ========
 def p_funcdef(p):
     '''funcdef : DEF header COLON funcdefhelp stmt stmtlist END'''
-    p[0] = Node('FuncDef', 'funcdef', [p[2], p[4], p[5], p[6]])
+    p[0] = FuncDef(p[2], p[4], p[5], p[6])
 
 def p_funcdefhelp_funcdef(p):
     '''funcdefhelp : funcdef funcdefhelp'''
-    p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1],p[2]])
+    p[0] = FuncDefHelp_FuncDef(p[1], p[2])
 
 def p_funcdefhelp_funcdecl(p):
     '''funcdefhelp : funcdecl funcdefhelp'''
-    p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1], p[2]])
+    p[0] = FuncDefHelp_FuncDecl(p[1], p[2])
 
 def p_funcdefhelp_vardef(p):
     '''funcdefhelp : vardef funcdefhelp'''
-    p[0] = Node('FuncDefHelp', 'funcdefhelp', [p[1], p[2]])
-
+    p[0] = FuncDefHelp_VarDef(p[1], p[2])
+    
 def p_funcdefhelp_empty(p):
     '''funcdefhelp : empty'''
     p[0] = None

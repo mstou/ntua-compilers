@@ -76,7 +76,7 @@ def p_formallist(p):
         p[0] = FormalList(p[2], p[3])
     elif len(p) == 2:
         p[0] = FormalList(None, None)
-        
+
 # ================ Type ================
 def p_type_simple(p):
     '''type : INT
@@ -96,25 +96,25 @@ def p_type_list(p):
 #=========== Func-decl ============
 def p_funcdecl(p):
     '''funcdecl : DECL header'''
-    p[0] = Node('FuncDecl', 'funcDecl', [p[2]])
+    p[0] = FuncDecl(p[2])
 
 #========== Var def ===============
 def p_vardef(p):
     '''vardef : type name namelist'''
-    p[0] = Node('VarDef', 'vardef', [p[1], p[2], p[3]])
+    p[0] = VariableDefinition(p[1], p[2], p[3])
 
 def p_nameList(p):
     '''namelist : COMMA name namelist
                 | empty
                 '''
     if len(p) == 4:
-        p[0] = Node('NameList', 'nameList', [p[2], p[3]])
+        p[0] = NameList(p[2], p[3])
     elif len(p) == 2:
-        p[0] =  Node('NameList', 'nameList', [p[1]])
+        p[0] =  None
 
 def p_name(p):
     '''name : NAME'''
-    p[0] = Node('Name', p[1])
+    p[0] = Name(p[1])
 
 #=========== Statement ==================
 def p_stmt_simple(p):

@@ -16,10 +16,14 @@ class Node:
 
 class FuncDef(Node): # function definition
     def __init__(self, header, functions, stmt, stmtlist):
-        self.header = header       # type
+        self.header = header       # type FunctionHeader
         self.functions = functions # type FuncDefHelp
         self.stmt = stmt           # type Statement
         self. stmtlist = stmtlist  # type
+
+class FuncDecl(Node): # function definition
+    def __init__(self, header):
+        self.header = header       # type FunctionHeader
 
 class FuncDefHelp(Node): # function definitions recursively
     def __init__(self, d, child):
@@ -58,6 +62,37 @@ class FormalList(Node):
     def __init__(self, formal, child):
         self.formal = formal
         self.child = child
+
+class Type(Node):
+    ''' General Class for Data Types '''
+    pass
+
+class Int(Type):
+    def __init__(self, data):
+        self.data = data
+
+class Bool(Type):
+    def __init__(self, data):
+        self.data = data
+
+class Char(Type):
+    def __init__(self, data):
+        self.data = data
+
+class VariableDefinition(Node):
+    def __init__(self, type, name, vars):
+        self.type = type
+        self.name = name
+        self.vars = vars
+
+class Name(Node):
+    def __init__(self, name):
+        self.name = name
+
+class NameList(Node):
+    def __init__(self, name, names):
+        self.name  = name
+        self.names = names
 
 
 #======== Map function =======

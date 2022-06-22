@@ -92,7 +92,7 @@ def p_type_array(p):
 def p_type_list(p):
     '''type : LIST LBRACKET type RBRACKET'''
     p[0] = List(type = p[3])
-    
+
 #=========== Func-decl ============
 def p_funcdecl(p):
     '''funcdecl : DECL header'''
@@ -222,11 +222,11 @@ def p_call(p):
 #=========== Atom =================
 def p_atom_id(p):
     '''atom : NAME'''
-    p[0] = Node('IdAtom', p[1])
+    p[0] = VarAtom(p[1])
 
 def p_atom_string(p):
     '''atom : STRING'''
-    p[0] = Node('StrAtom', p[1])
+    p[0] = StringAtom(p[1])
 
 def p_atom_expression(p):
     '''atom : atom LBRACKET expression RBRACKET'''
@@ -243,15 +243,15 @@ def p_expression_atom(p):
 
 def p_expression_int_const(p):
     '''expression : NUMBER'''
-    p[0] = Node('int_cost', p[1])
+    p[0] = Int(p[1])
 
 def p_expression_char_const(p):
     '''expression : CHAR'''
-    p[0] = Node('char_const', p[1])
+    p[0] = Char(p[1])
 
 def p_expression_parentheses(p):
     '''expression : LPAREN expression RPAREN'''
-    p[0] = Node('ParenExpr', '()', [p[2]])
+    p[0] = ParenthesisExpr(p[2])
 
 def p_expression_uminus(p):
      'expression : MINUS expression %prec UMINUS'
@@ -268,7 +268,7 @@ def p_expression_binary_arithmetic(p):
                   | expression DIVIDE expression
                   | expression MOD expression
                   '''
-    p[0] = Node('BinArithmeticExpr', p[2], [p[1], p[3]])
+    p[0] = BinaryOperator(p[1], p[2], p[3])
 
 def p_expression_compare(p):
     ''' expression : expression EQUAL expression
@@ -278,23 +278,24 @@ def p_expression_compare(p):
                    | expression LEQ expression
                    | expression GEQ expression
                    '''
-    p[0] = Node('CompExpr', p[2], [p[1], p[3]])
+    p[0] = BinaryComparison(p[1], p[2], p[3])
+
 
 def p_expression_bool_const(p):
     '''expression : TRUE
                   | FALSE
                   '''
-    p[0] = Node('bool_const', p[1])
+    p[0] = Bool(p[1])
 
 def p_expression_not(p):
     '''expression : NOT expression'''
-    p[0] = Node('NotExpr', 'not', [p[2]])
+    p[0] = Not(p[2])
 
 def p_expression_binary_boolean(p):
     '''expression : expression AND expression
                   | expression OR expression
                   '''
-    p[0] = Node('BinBoolExpr', p[2], [p[1], p[3]])
+    p[0] = BinaryBoolean(p[1], p[2], p[3])
 
 def p_expression_new(p):
     '''expression : NEW type LBRACKET expression RBRACKET'''

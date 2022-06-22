@@ -119,70 +119,70 @@ def p_name(p):
 #=========== Statement ==================
 def p_stmt_simple(p):
     '''stmt : simple'''
-    p[0] = Node('Statement', 'stmt', [p[1]])
+    p[0] = p[1]
 
 def p_stmt_exit(p):
     '''stmt : EXIT'''
-    p[0] = Node('ExitStatement', 'exitStmt')
+    p[0] = ExitStatement()
 
 def p_stmt_return(p):
     '''stmt : RETURN expression'''
-    p[0] = Node('ReturnStatement', 'returnStmt', [p[2]])
+    p[0] = ReturnStatement(p[2])
 
 def p_stmt_if(p):
     '''stmt : if END'''
-    p[0] = Node('IfStatement', 'ifStmt', [p[1]])
+    p[0] = p[1]
 
 def p_stmt_if_elsif(p):
     '''stmt : if elsiflist END'''
-    p[0] = Node('IfElsifStatement', 'ifElsifStmt', [p[1], p[2]])
+    p[0] = IfElsifStatement(p[1], p[2])
 
 def p_stmt_ifelse(p):
     '''stmt : if else END'''
-    p[0] = Node('IfElseStatement', 'ifElseStmt', [p[1], p[2]])
+    p[0] = IfElseStatement(p[1], p[2])
 
 def p_stmt_if_full(p):
     '''stmt : if elsiflist else END'''
-    p[0] = Node('IfElsifElseStatement', 'ifElsifElseStmt', [p[1], p[2], p[3]])
+    p[0] = IfFullStatement(p[1], p[2], p[3])
 
 def p_stmtlist(p):
     '''stmtlist : stmt stmtlist
                 | empty
                 '''
     if len(p) == 3:
-        p[0] = Node('StmtList', 'stmtlist', [p[1], p[2]])
+        p[0] = StatementList(p[1], p[2])
     elif len(p) == 2:
-        p[0] = Node('StmtList', 'stmtlist', [p[1]])
+        p[0] = StatementList(None, None)
 
 def p_if(p):
     '''if : IF expression COLON stmt stmtlist'''
-    p[0] = Node('If', 'if', [p[2], p[4], p[5]])
+    p[0] = IfStatement(p[2], p[4], p[5])
 
 def p_elsif(p):
     '''elsif : ELSIF expression COLON stmt stmtlist'''
-    p[0] = Node('ElsIf', 'elsIf', [p[2], p[4], p[5]])
+    p[0] = ElsifStatement(p[2], p[4], p[5])
 
 def p_elsiflist(p):
     '''elsiflist : elsif elsiflist
                  | empty
                  '''
     if len(p) == 3:
-        p[0] = Node('ElsIfList', 'elsIfList', [p[1], p[2]])
+        p[0] = ElsifList(p[1], p[2])
     elif len(p) == 2:
-        p[0] = Node('ElsIfList', 'elsIfList', [p[1]])
+        p[0] = ElsifList(None, None)
 
 def p_else(p):
     '''else : ELSE COLON stmt stmtlist'''
-    p[0] = Node('Else', 'else', [p[3], p[4]])
+    p[0] = ElseStatement(p[3], p[4])
 
 def p_stmt_for(p):
     '''stmt : FOR simplelist SEMICOLON expression SEMICOLON simplelist COLON stmt stmtlist END'''
-    p[0] = Node('ForStmt', 'for', [p[2], p[4], p[6], p[8], p[9]])
+    p[0] = ForLoop(p[2], p[4], p[6], p[8], p[9])
 
 #=========== Simple ==============
 def p_simple_skip(p):
     '''simple : SKIP'''
-    p[0] = Node("SkipSimple", 'skip')
+    p[0] = SkipStatment()
 
 def p_simple_atomexpr(p):
     '''simple : atom ASSIGN expression'''

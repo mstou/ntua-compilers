@@ -83,16 +83,16 @@ def p_type_simple(p):
             | BOOL
             | CHAR
             '''
-    p[0] = Node('SimpleType', p[1])
+    p[0] = p[1]
 
 def p_type_array(p):
     '''type : type LBRACKET RBRACKET'''
-    p[0] = Node('ArrayType', '[]', [p[1]])
+    p[0] = Array(type = p[1])
 
 def p_type_list(p):
     '''type : LIST LBRACKET type RBRACKET'''
-    p[0] = Node('ListType', 'list', [p[3]])
-
+    p[0] = List(type = p[3])
+    
 #=========== Func-decl ============
 def p_funcdecl(p):
     '''funcdecl : DECL header'''

@@ -1,13 +1,13 @@
 from .node import Node
 
-class Type(Node):
+class TypeNode(Node):
     ''' General Class for Data Types '''
     pass
 
-class Array(Type):
+class Array(TypeNode):
     def __init__(self, type):
         self.type = type
 
-class List(Type):
+class List(TypeNode):
     def __init__(self, type):
         self.type = type

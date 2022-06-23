@@ -1,11 +1,4 @@
-from enum import Enum
-
-class Type(Enum):
-   INT  = 1
-   CHAR = 2
-   BOOL = 3
-   VOID = 4
-   NIL  = 5
+from abstract_syntax_tree import *
 
 class SymbolEntry:
     def __init__(self, type):
@@ -55,6 +48,9 @@ class SymbolTable:
 
         return None
 
+    def lookup_current_scope(self, s):
+        return self.scopes[-1].lookup(s)
+
     def __str__(self):
         s = ''
         for index, sc in enumerate(self.scopes):
@@ -67,13 +63,13 @@ class SymbolTable:
 
 # st = SymbolTable()
 # st.openScope()
-# st.insert("x", Type.INT)
+# st.insert("x", Type.Int)
 # print(st)
-# st.insert("y", Type.BOOL)
+# st.insert("y", Type.Bool)
 # print(f'x look up: {st.lookup("x")}')
 # print(st)
 # st.openScope()
-# st.insert("x", Type.BOOL)
+# st.insert("x", Type.Bool)
 # print(st)
 # print(f'x look up: {st.lookup("x")}')
 # print(f'y look up: {st.lookup("y")}')

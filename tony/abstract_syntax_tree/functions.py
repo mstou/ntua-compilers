@@ -5,7 +5,11 @@ class FuncDef(Node): # function definition
         self.header = header       # type FunctionHeader
         self.functions = functions # type FuncDefHelp
         self.stmt = stmt           # type Statement
-        self. stmtlist = stmtlist  # type
+        self.stmtlist = stmtlist   # type
+
+    def sem(self, symbol_table):
+        pass
+
 
 class FuncDecl(Node): # function definition
     def __init__(self, header):

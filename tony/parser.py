@@ -1,6 +1,7 @@
 import sys
 import ply.yacc as yacc
 from abstract_syntax_tree import *
+from symbol_table import *
 
 # Get the token map from the lexer.
 from lexer import tokens
@@ -20,7 +21,7 @@ precedence = (
 
 def p_program(p):
     '''program : funcdef'''
-    p[0] = Node('Program', 'program', [p[1]])
+    p[0] = Program(SymbolTable(), p[1])
 
 #======== Function definition ========
 def p_funcdef(p):
@@ -78,12 +79,17 @@ def p_formallist(p):
         p[0] = FormalList(None, None)
 
 # ================ Type ================
-def p_type_simple(p):
-    '''type : INT
-            | BOOL
-            | CHAR
-            '''
-    p[0] = p[1]
+def p_type_simple_int(p):
+    '''type : INT'''
+    p[0] = Type.Int
+
+def p_type_simple_bool(p):
+    '''type : BOOL'''
+    p[0] = Type.Bool
+
+def p_type_simple_char(p):
+    '''type : CHAR'''
+    p[0] = Type.Char
 
 def p_type_array(p):
     '''type : type LBRACKET RBRACKET'''
@@ -101,7 +107,7 @@ def p_funcdecl(p):
 #========== Var def ===============
 def p_vardef(p):
     '''vardef : type name namelist'''
-    p[0] = VariableDefinition(p[1], p[2], p[3])
+    p[0] = VariableDefinition(p[1], names = [p[2]] + p[3].getNames())
 
 def p_nameList(p):
     '''namelist : COMMA name namelist
@@ -110,11 +116,11 @@ def p_nameList(p):
     if len(p) == 4:
         p[0] = NameList(p[2], p[3])
     elif len(p) == 2:
-        p[0] =  None
+        p[0] =  NameList(None, None)
 
 def p_name(p):
     '''name : NAME'''
-    p[0] = Name(p[1])
+    p[0] = p[1]
 
 #=========== Statement ==================
 def p_stmt_simple(p):

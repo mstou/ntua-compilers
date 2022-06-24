@@ -1,10 +1,10 @@
-from abstract_syntax_tree import *
-
 class SymbolEntry:
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, type, ref=False):
+        self.type      = type
+        self.reference = ref
+
     def __str__(self):
-        return str(self.type)
+        return f'{'ref' if self.reference else ''} {self.type}'
 
 class Scope:
     def __init__(self):

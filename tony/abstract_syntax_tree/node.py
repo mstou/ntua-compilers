@@ -7,6 +7,7 @@ class Type(Enum):
    Bool = 3
    Void = 4
    Nil  = 5
+   Function = 6 # TODO: Issue #1
 
 class Node:
     def __init__(self, type, value, children=None):

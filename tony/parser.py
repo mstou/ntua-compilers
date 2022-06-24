@@ -56,9 +56,9 @@ def p_header(p):
     elif len(p) == 5:  # Rule 2
         p[0] = FunctionHeader(p[1], p[2], None, None)
     elif len(p) == 6:  # Rule 3
-        p[0] = FunctionHeader(None, p[1], p[3], p[4])
+        p[0] = FunctionHeader(Type.Void, p[1], p[3], p[4])
     elif len(p) == 4:  # Rule 4
-        p[0] = FunctionHeader(None, p[1], None, None)
+        p[0] = FunctionHeader(Type.Void, p[1], None, None)
 
 #=========== Formal ==============
 def p_formal(p):

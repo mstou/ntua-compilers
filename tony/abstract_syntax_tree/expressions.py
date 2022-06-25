@@ -33,23 +33,67 @@ class BinaryBoolean(Expression):
         self.op    = op
         self.right = right
 
-class Int(Expression):
+class IntValue(Expression):
     def __init__(self, data):
         self.data = data
 
     def eval(self):
         return self.data
 
-class Bool(Expression):
+class BooleanValue(Expression):
     def __init__(self, data):
         self.data = data
 
     def eval(self):
         return self.data
 
-class Char(Expression):
+class CharValue(Expression):
     def __init__(self, data):
         self.data = data
 
     def eval(self):
         return self.data
+
+class AtomArray(Expression):
+    def __init__(self, atom, expr):
+        self.atom = atom
+        self.expr = expr
+
+class UniArithmeticPLUS(Expression):
+    def __init__(self, expr):
+        self.expr = expr
+
+class UniArithmeticMINUS(Expression):
+    def __init__(self, expr):
+        self.expr = expr
+
+class NewArray(Expression):
+    def __init__(self, type, expr):
+        self.type = type
+        self.expr = expr
+
+class isEmptyList(Expression):
+    def __init__(self, expr):
+        self.expr = expr
+
+class ListOperator(Expression):
+    def __init__(self, left, right):
+        self.head = left
+        self.tail = right
+
+class TailOperator(Expression):
+    def __init__(self, expr):
+        self.expr = expr
+
+class HeadOperator(Expression):
+    def __init__(self, expr):
+        self.expr = expr
+
+class CommaExpr(Expression):
+    def __init__(self, expr, comma_expr):
+        self.expr = expr
+        self.comma_expr = comma_expr
+
+    def getExpressions(self):
+        return [] if self.expr == None\
+        else [self.expr] + self.comma_expr.getExpressions()

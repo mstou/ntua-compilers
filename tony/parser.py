@@ -236,24 +236,24 @@ def p_atom_string(p):
 
 def p_atom_expression(p):
     '''atom : atom LBRACKET expression RBRACKET'''
-    p[0] = Node('ExprAtom', 'exprAtom', [p[1], p[3]])
+    p[0] = AtomArray(p[1], p[3])
 
 def p_atom_call(p):
     '''atom : call'''
-    p[0] = Node('CallAtom', 'callAtom', [p[1]])
+    p[0] = p[1]
 
 #=========== Expression ================
 def p_expression_atom(p):
     '''expression : atom'''
-    p[0] = Node('AtomExpr', 'atomExpr', [p[1]])
+    p[0] = p[1]
 
 def p_expression_int_const(p):
     '''expression : NUMBER'''
-    p[0] = Int(p[1])
+    p[0] = IntValue(p[1])
 
 def p_expression_char_const(p):
     '''expression : CHAR'''
-    p[0] = Char(p[1])
+    p[0] = CharValue(p[1])
 
 def p_expression_parentheses(p):
     '''expression : LPAREN expression RPAREN'''
@@ -261,11 +261,11 @@ def p_expression_parentheses(p):
 
 def p_expression_uminus(p):
      'expression : MINUS expression %prec UMINUS'
-     p[0] = Node('UniArithmeticExpr', p[1], [p[2]])
+     p[0] = UniArithmeticMINUS(p[2])
 
 def p_expression_uplus(p):
      'expression : PLUS expression %prec UPLUS'
-     p[0] = Node('UniArithmeticExpr', p[1], [p[2]])
+     p[0] = UniArithmeticPLUS(p[2])
 
 def p_expression_binary_arithmetic(p):
     '''expression : expression PLUS expression
@@ -291,7 +291,7 @@ def p_expression_bool_const(p):
     '''expression : TRUE
                   | FALSE
                   '''
-    p[0] = Bool(p[1])
+    p[0] = BooleanValue(p[1])
 
 def p_expression_not(p):
     '''expression : NOT expression'''
@@ -305,36 +305,36 @@ def p_expression_binary_boolean(p):
 
 def p_expression_new(p):
     '''expression : NEW type LBRACKET expression RBRACKET'''
-    p[0] = Node('NewExpr', p[1], [p[2], p[4]])
+    p[0] = NewArray(p[2], p[4])
 
 def p_expression_nil(p):
     '''expression : NIL'''
-    p[0] = Node('NilExpr', p[1])
+    p[0] = EmptyList()
 
 def p_expression_nil2(p):
     '''expression : NIL2 LPAREN expression RPAREN'''
-    p[0] = Node('Nil2Expr', p[1], [p[3]])
+    p[0] = isEmptyList(p[3])
 
 def p_expression_hash(p):
     '''expression : expression HASH expression'''
-    p[0] = Node('HashExpr', p[2], [p[1], p[3]])
+    p[0] = ListOperator(p[1], p[2])
 
 def p_expression_head(p):
     '''expression : HEAD LPAREN expression RPAREN'''
-    p[0] = Node('HeadExpr', p[1], [p[3]])
+    p[0] = HeadOperator(p[3])
 
 def p_expression_tail(p):
     '''expression : TAIL LPAREN expression RPAREN'''
-    p[0] = Node('TailExpr', 'tailExpr', [p[3]])
+    p[0] = TailOperator(p[3])
 
 def p_exprcomma(p): # rule to parse: expr (, expr)*
     '''exprcomma : COMMA expression exprcomma
                  | empty
                  '''
     if len(p) == 4:
-        p[0] = Node('CommaExpr', 'commaExpr', [p[2], p[3]])
+        p[0] = CommaExpr(p[2], p[3])
     if len(p) == 2:
-        p[0] = Node('CommaExpr', 'commaExpr', [p[1]])
+        p[0] = CommaExpr(None, None)
 
 #================= Empty =================
 def p_empty(p):

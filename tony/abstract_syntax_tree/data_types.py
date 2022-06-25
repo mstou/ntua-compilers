@@ -11,3 +11,7 @@ class Array(TypeNode):
 class List(TypeNode):
     def __init__(self, type):
         self.type = type
+
+class EmptyList(TypeNode):
+    def __init__(self):
+        pass

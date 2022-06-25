@@ -192,26 +192,25 @@ def p_simple_skip(p):
 
 def p_simple_atomexpr(p):
     '''simple : atom ASSIGN expression'''
-    p[0] = Node('AssignExpr', ':=', [p[1], p[3]])
+    p[0] = Assignment(p[1], p[3])
 
 def p_simple_call(p):
     '''simple : call'''
-    p[0] = Node('CallSimple', 'simpleCall', [p[1]])
+    p[0] = p[1]
 
 #======== Simple - List ===========
 def p_simplelist(p):
     '''simplelist : simple simplelistcomma'''
-    p[0] = Node('SimpleList', 'simpleList', [p[1], p[2]])
+    p[0] = SimpleList(simples = [p[1]] + p[2].getSimples())
 
 def p_simplelistcomma(p):
-    '''simplelistcomma : COMMA simplelist
+    '''simplelistcomma : COMMA simple simplelistcomma
                        | empty
                        '''
-    if len(p) == 3:
-        p[0] = Node('SimpleListComma', 'simpleListComma', [p[2]])
+    if len(p) == 4:
+        p[0] = SimpleListComma(p[2],p[3])
     elif len(p) == 2:
-        p[0] = Node('SimpleListComma', 'simpleListComma', [p[1]])
-
+        p[0] = SimpleListComma(None,None)
 
 # #=========== Call ===============
 def p_call(p):
@@ -219,11 +218,11 @@ def p_call(p):
             | NAME LPAREN expression RPAREN
             | NAME LPAREN RPAREN'''
     if len(p) == 6:
-        p[0] = Node('Call', 'call ' + p[1], [p[3], p[4]])
+        p[0] = FunctionCall(p[1], [p[3]] + p[4].getExpressions())
     elif len(p) == 5:
-        p[0] = Node('Call', 'call ' + p[1], [p[3]])
+        p[0] = FunctionCall(p[1], [p[3]])
     elif len(p) == 4:
-        p[0] = Node('Call', 'call ' + p[1])
+        p[0] = FunctionCall(p[1], [])
 
 #=========== Atom =================
 def p_atom_id(p):

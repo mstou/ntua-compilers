@@ -9,7 +9,7 @@ class ExitStatement(Statement):
         pass
 
 class SkipStatment(Statement):
-    def __init__(self):    
+    def __init__(self):
         pass
 
 class ReturnStatement(Statement):
@@ -66,3 +66,26 @@ class ForLoop(Statement):
         self.ending    = ending
         self.stmt      = stmt
         self.stmtlist  = stmtlist
+
+class FunctionCall(Statement):
+    def __init__(self, name, expressions):
+        self.name = name
+        self.expressions = expressions
+
+class Assignment(Statement):
+    def __init__(self, atom, expr):
+        self.atom = atom
+        self.expr = expr
+
+class SimpleListComma(Statement):
+    def __init__(self, simple, simplelistcomma):
+        self.simple = simple
+        self.simplelistcomma = simplelistcomma
+
+    def getSimples(self):
+        return [] if self.simple == None\
+        else [self.simple] + self.simplelistcomma.getSimples()
+
+class SimpleList(Statement):
+    def __init__(self, simples):
+        self.simples = simples

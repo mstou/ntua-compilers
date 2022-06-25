@@ -4,7 +4,7 @@ class SymbolEntry:
         self.reference = ref
 
     def __str__(self):
-        return f'{'ref' if self.reference else ''} {self.type}'
+        return f'{"ref" if self.reference else ""} {self.type}'
 
 class Scope:
     def __init__(self):

@@ -40,7 +40,8 @@ class FunctionHeader(Node):
         self.funtion_type = type
         self.function_name = name
 
-        self.all_formals = [formal] + formallist.getFormals()
+        self.all_formals = [] if formal == None else\
+                           [formal] + formallist.getFormals()
 
     def sem(self, symbol_table):
         '''
@@ -79,6 +80,6 @@ class FormalList(Node):
         self.formal = formal
         self.child = child
 
-    def getFormals():
+    def getFormals(self):
         return [] if self.formal == None else\
                [self.formal] + self.child.getFormals()

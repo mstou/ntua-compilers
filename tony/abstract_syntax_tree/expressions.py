@@ -7,9 +7,17 @@ class Expression(Node):
         ''' Returns the value of the expression '''
         pass
 
+    def sem(self, symbol_table):
+        ''' Checks that the semantics are correct and
+            returns the type of the expression '''
+        pass
+
 class ParenthesisExpr(Expression):
     def __init__(self, expr):
         self.expr = expr
+
+    def sem(self, symbol_table):
+        return self.expr.sem()
 
 class BinaryOperator(Expression):
     def __init__(self, left, op, right):
@@ -27,6 +35,15 @@ class Not(Expression):
     def __init__(self, expr):
         self.expr  = expr
 
+    def sem(self, symbol_table):
+        t = self.expr.sem()
+
+        if t != Type.Bool:
+            error_msg = f'Expected the operand of not\
+            to be Bool but {t} was given.'
+
+            raise Exception(error_msg)
+
 class BinaryBoolean(Expression):
     def __init__(self, left, op, right):
         self.left  = left
@@ -40,6 +57,9 @@ class IntValue(Expression):
     def eval(self):
         return self.data
 
+    def sem(self, symbol_table):
+        return Type.Int
+
 class BooleanValue(Expression):
     def __init__(self, data):
         self.data = data
@@ -47,12 +67,18 @@ class BooleanValue(Expression):
     def eval(self):
         return self.data
 
+    def sem(self, symbol_table):
+        return Type.Bool
+
 class CharValue(Expression):
     def __init__(self, data):
         self.data = data
 
     def eval(self):
         return self.data
+
+    def sem(self, symbol_table):
+        return Type.Char
 
 class AtomArray(Expression):
     def __init__(self, atom, expr):

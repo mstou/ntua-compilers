@@ -40,9 +40,11 @@ class Not(Expression):
 
         if t != Type.Bool:
             error_msg = f'Expected the operand of not\
-            to be Bool but {t} was given.'
+            to be of type Bool but {t} was given.'
 
             raise Exception(error_msg)
+
+        return Type.Bool
 
 class BinaryBoolean(Expression):
     def __init__(self, left, op, right):
@@ -89,9 +91,32 @@ class UniArithmeticPLUS(Expression):
     def __init__(self, expr):
         self.expr = expr
 
+    def sem(self, symbol_table):
+        t = self.expr.sem()
+
+        if t != Type.Int:
+            error_msg = f'Can not use unary "+"\
+            with type {t}'
+
+            raise Exception(error_msg)
+
+        return t
+
 class UniArithmeticMINUS(Expression):
     def __init__(self, expr):
         self.expr = expr
+
+
+    def sem(self, symbol_table):
+        t = self.expr.sem()
+
+        if t != Type.Int:
+            error_msg = f'Can not use unary "-"\
+            with type {t}'
+
+            raise Exception(error_msg)
+
+        return t
 
 class NewArray(Expression):
     def __init__(self, type, expr):

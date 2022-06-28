@@ -12,6 +12,10 @@ class Expression(Node):
             returns the type of the expression '''
         pass
 
+    def pprint(self, indent=0):
+        ''' Pretty-printing of the Node with custom indentation '''
+        pass
+
 class ParenthesisExpr(Expression):
     def __init__(self, expr):
         self.expr = expr
@@ -19,17 +23,39 @@ class ParenthesisExpr(Expression):
     def sem(self, symbol_table):
         return self.expr.sem()
 
+    def pprint(self, indent = 0):
+        return f'{" " * indent}({self.expr})'
+
+    def __str__(self, ):
+        return self.pprint()
+
 class BinaryOperator(Expression):
     def __init__(self, left, op, right):
         self.left  = left
         self.op    = op
         self.right = right
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.op}\n' +\
+               self.left.pprint(indent+2)+'\n'+\
+               self.right.pprint(indent+2)
+
+    def __str__(self):
+        return self.pprint()
+
 class BinaryComparison(Expression):
     def __init__(self, left, op, right):
         self.left  = left
         self.op    = op
         self.right = right
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.op}\n' +\
+               self.left.pprint(indent+2)+'\n'+\
+               self.right.pprint(indent+2)
+
+    def __str__(self):
+        return self.pprint()
 
 class Not(Expression):
     def __init__(self, expr):
@@ -41,16 +67,30 @@ class Not(Expression):
         if t != Type.Bool:
             error_msg = f'Expected the operand of not\
             to be of type Bool but {t} was given.'
-
             raise Exception(error_msg)
 
         return Type.Bool
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}not\n'+\
+               self.expr.pprint(indent=indent+2)
+
+    def __str__(self):
+        return self.pprint()
 
 class BinaryBoolean(Expression):
     def __init__(self, left, op, right):
         self.left  = left
         self.op    = op
         self.right = right
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.op}\n' +\
+               self.left.pprint(indent+2)+'\n'+\
+               self.right.pprint(indent+2)
+
+    def __str__(self):
+        return self.pprint()
 
 class IntValue(Expression):
     def __init__(self, data):
@@ -62,6 +102,12 @@ class IntValue(Expression):
     def sem(self, symbol_table):
         return Type.Int
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.data}'
+
+    def __str__(self):
+        return self.pprint()
+
 class BooleanValue(Expression):
     def __init__(self, data):
         self.data = data
@@ -71,6 +117,12 @@ class BooleanValue(Expression):
 
     def sem(self, symbol_table):
         return Type.Bool
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.data}'
+
+    def __str__(self):
+        return self.pprint()
 
 class CharValue(Expression):
     def __init__(self, data):
@@ -82,10 +134,23 @@ class CharValue(Expression):
     def sem(self, symbol_table):
         return Type.Char
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.data}'
+
+    def __str__(self):
+        return self.pprint()
+
 class AtomArray(Expression):
     def __init__(self, atom, expr):
         self.atom = atom
         self.expr = expr
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}{self.atom}[ . ]\n'+\
+               self.expr.pprint(indent=indent+2)
+
+    def __str__(self):
+        return self.pprint()
 
 class UniArithmeticPLUS(Expression):
     def __init__(self, expr):
@@ -102,10 +167,16 @@ class UniArithmeticPLUS(Expression):
 
         return t
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}unary (+)\n' +\
+               self.expr.pprint(indent=indent+2)
+
+    def __str__(self):
+        return self.pprint()
+
 class UniArithmeticMINUS(Expression):
     def __init__(self, expr):
         self.expr = expr
-
 
     def sem(self, symbol_table):
         t = self.expr.sem()
@@ -118,27 +189,67 @@ class UniArithmeticMINUS(Expression):
 
         return t
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}unary (-)\n' +\
+               self.expr.pprint(indent=indent+2)
+
+    def __str__(self):
+        return self.pprint()
+
+
 class NewArray(Expression):
     def __init__(self, type, expr):
         self.type = type
         self.expr = expr
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}new array {self.type} of length\n'+\
+               self.expr.pprint(indent=indent+2)
+
+    def __str__(self):
+        return self.pprint()
+
+
 class isEmptyList(Expression):
     def __init__(self, expr):
         self.expr = expr
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}nil?\n'+\
+               self.expr.pprint(indent=indent+2)
+
+    def __str__(self):
+        return self.pprint()
 
 class ListOperator(Expression):
     def __init__(self, left, right):
         self.head = left
         self.tail = right
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}new list with (head,tail):\n'+\
+               self.head.pprint(indent=indent+2)+'\n'+\
+               self.tail.pprint(indent=indent+2)
+
 class TailOperator(Expression):
     def __init__(self, expr):
         self.expr = expr
 
+    def pprint(self, indent=0):
+        return f'{" " * indent}tail of\n'+\
+               self.expr.pprint(indent=indent+2)
+    def __str__(self):
+        return self.pprint()
+
 class HeadOperator(Expression):
     def __init__(self, expr):
         self.expr = expr
+
+    def pprint(self, indent=0):
+        return f'{" " * indent}head of\n'+\
+               self.expr.pprint(indent=indent+2)
+    def __str__(self):
+        return self.pprint()
 
 class CommaExpr(Expression):
     def __init__(self, expr, comma_expr):
@@ -148,3 +259,19 @@ class CommaExpr(Expression):
     def getExpressions(self):
         return [] if self.expr == None\
         else [self.expr] + self.comma_expr.getExpressions()
+
+    def pprint(self, indent=0):
+        s = f'{" " * indent}Comma Separated Expressions:\n'
+
+        expressions = self.getExpressions()
+        n = len(expressions)
+
+        for i,e in enumerate(expressions):
+            s += e.pprint(indent=indent+2)
+            if i != n-1:
+                s += '\n'
+
+        return s
+
+    def __str__(self):
+        return self.pprint()

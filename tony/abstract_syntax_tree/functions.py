@@ -1,11 +1,29 @@
 from .node import Node, indentation
 
 class FuncDef(Node): # function definition
-    def __init__(self, header, functions, stmt, stmtlist):
-        self.header = header       # type FunctionHeader
-        self.functions = functions # type FuncDefHelp
-        self.stmt = stmt           # type Statement
-        self.stmtlist = stmtlist   # type
+    def __init__(self, header, funcdefhelp, stmt, stmtlist):
+        self.header      = header      # type FunctionHeader
+        self.funcdefhelp = funcdefhelp # type FuncDefHelp
+        self.stmt        = stmt        # type Statement
+        self.stmtlist    = stmtlist
+
+        self.vardefs   = []
+        self.funcdefs  = []
+        self.funcdecls = []
+
+        for _def in self.funcdefhelp.getDefinitions():
+            t = _def.statement_type
+
+            if t == 'funcdecl':
+                self.funcdecls.append(_def.d)
+            elif t == 'funcdef':
+                self.funcdefs.append(_def.d)
+            elif t == 'vardef':
+                self.vardefs.append(_def.d)
+
+        self.statements = [self.stmt] + self.stmtlist.getStatements()
+        
+
 
     def sem(self, symbol_table):
         pass
@@ -20,19 +38,26 @@ class FuncDefHelp(Node): # function definitions recursively
         self.d = d
         self.child = child
 
+    def getDefinitions(self):
+        return [] if self.d == None\
+               else [self] + self.child.getDefinitions()
+
 class FuncDefHelp_FuncDecl(FuncDefHelp):
     def __init__(self, d, child):
-        super().__init__(d, help)
+        super().__init__(d, child)
+        self.statement_type = 'funcdecl'
 
 
 class FuncDefHelp_FuncDef(FuncDefHelp):
     def __init__(self, d, child):
-        super().__init__(d, help)
+        super().__init__(d, child)
+        self.statement_type = 'funcdef'
 
 
 class FuncDefHelp_VarDef(FuncDefHelp):
     def __init__(self, d, child):
-        super().__init__(d, help)
+        super().__init__(d, child)
+        self.statement_type = 'vardef'
 
 
 class FunctionHeader(Node):

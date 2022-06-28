@@ -21,6 +21,10 @@ class StatementList(Statement):
         self.stmt     = stmt
         self.children = children
 
+    def getStatements(self):
+        return [] if self.stmt == None\
+               else [self.stmt] + self.children.getStatements()
+
 class IfStatement(Statement):
     def __init__(self, condition, statement, stmtlist):
         self.condition = condition

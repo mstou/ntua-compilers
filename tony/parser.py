@@ -42,7 +42,7 @@ def p_funcdefhelp_vardef(p):
 
 def p_funcdefhelp_empty(p):
     '''funcdefhelp : empty'''
-    p[0] = None
+    p[0] = FuncDefHelp(None, None)
 
 #=========== Header ==============
 def p_header(p):

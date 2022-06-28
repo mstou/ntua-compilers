@@ -50,6 +50,14 @@ class Program(Node):
         return self.main.sem(symbol_table)
 
 
+def indentation(indent):
+    if indent == 0:
+        return ''
+
+    s = ' ' * (indent-2)
+    s += '|-- '
+
+    return s
 #======== Map function =======
 def mapTree(node, f):
     newType = node.type

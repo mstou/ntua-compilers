@@ -1,4 +1,4 @@
-from .node import Node
+from .node import Node, indentation
 
 class Expression(Node):
     ''' Generic class for expressions '''
@@ -24,7 +24,7 @@ class ParenthesisExpr(Expression):
         return self.expr.sem()
 
     def pprint(self, indent = 0):
-        return f'{" " * indent}({self.expr})'
+        return f'{indentation(indent)}({self.expr})'
 
     def __str__(self, ):
         return self.pprint()
@@ -36,7 +36,7 @@ class BinaryOperator(Expression):
         self.right = right
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.op}\n' +\
+        return f'{indentation(indent)}{self.op}\n' +\
                self.left.pprint(indent+2)+'\n'+\
                self.right.pprint(indent+2)
 
@@ -50,7 +50,7 @@ class BinaryComparison(Expression):
         self.right = right
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.op}\n' +\
+        return f'{indentation(indent)}{self.op}\n' +\
                self.left.pprint(indent+2)+'\n'+\
                self.right.pprint(indent+2)
 
@@ -72,7 +72,7 @@ class Not(Expression):
         return Type.Bool
 
     def pprint(self, indent=0):
-        return f'{" " * indent}not\n'+\
+        return f'{indentation(indent)}not\n'+\
                self.expr.pprint(indent=indent+2)
 
     def __str__(self):
@@ -85,7 +85,7 @@ class BinaryBoolean(Expression):
         self.right = right
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.op}\n' +\
+        return f'{indentation(indent)}{self.op}\n' +\
                self.left.pprint(indent+2)+'\n'+\
                self.right.pprint(indent+2)
 
@@ -103,7 +103,7 @@ class IntValue(Expression):
         return Type.Int
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.data}'
+        return f'{indentation(indent)}{self.data}'
 
     def __str__(self):
         return self.pprint()
@@ -119,7 +119,7 @@ class BooleanValue(Expression):
         return Type.Bool
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.data}'
+        return f'{indentation(indent)}{self.data}'
 
     def __str__(self):
         return self.pprint()
@@ -135,7 +135,7 @@ class CharValue(Expression):
         return Type.Char
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.data}'
+        return f'{indentation(indent)}{self.data}'
 
     def __str__(self):
         return self.pprint()
@@ -146,7 +146,7 @@ class AtomArray(Expression):
         self.expr = expr
 
     def pprint(self, indent=0):
-        return f'{" " * indent}{self.atom}[ . ]\n'+\
+        return f'{indentation(indent)}{self.atom}[ . ]\n'+\
                self.expr.pprint(indent=indent+2)
 
     def __str__(self):
@@ -168,7 +168,7 @@ class UniArithmeticPLUS(Expression):
         return t
 
     def pprint(self, indent=0):
-        return f'{" " * indent}unary (+)\n' +\
+        return f'{indentation(indent)}unary (+)\n' +\
                self.expr.pprint(indent=indent+2)
 
     def __str__(self):
@@ -190,7 +190,7 @@ class UniArithmeticMINUS(Expression):
         return t
 
     def pprint(self, indent=0):
-        return f'{" " * indent}unary (-)\n' +\
+        return f'{indentation(indent)}unary (-)\n' +\
                self.expr.pprint(indent=indent+2)
 
     def __str__(self):
@@ -203,7 +203,7 @@ class NewArray(Expression):
         self.expr = expr
 
     def pprint(self, indent=0):
-        return f'{" " * indent}new array {self.type} of length\n'+\
+        return f'{indentation(indent)}new array {self.type} of length\n'+\
                self.expr.pprint(indent=indent+2)
 
     def __str__(self):
@@ -215,7 +215,7 @@ class isEmptyList(Expression):
         self.expr = expr
 
     def pprint(self, indent=0):
-        return f'{" " * indent}nil?\n'+\
+        return f'{indentation(indent)}nil?\n'+\
                self.expr.pprint(indent=indent+2)
 
     def __str__(self):
@@ -227,7 +227,7 @@ class ListOperator(Expression):
         self.tail = right
 
     def pprint(self, indent=0):
-        return f'{" " * indent}new list with (head,tail):\n'+\
+        return f'{indentation(indent)}new list with (head,tail):\n'+\
                self.head.pprint(indent=indent+2)+'\n'+\
                self.tail.pprint(indent=indent+2)
 
@@ -236,7 +236,7 @@ class TailOperator(Expression):
         self.expr = expr
 
     def pprint(self, indent=0):
-        return f'{" " * indent}tail of\n'+\
+        return f'{indentation(indent)}tail of\n'+\
                self.expr.pprint(indent=indent+2)
     def __str__(self):
         return self.pprint()
@@ -246,7 +246,7 @@ class HeadOperator(Expression):
         self.expr = expr
 
     def pprint(self, indent=0):
-        return f'{" " * indent}head of\n'+\
+        return f'{indentation(indent)}head of\n'+\
                self.expr.pprint(indent=indent+2)
     def __str__(self):
         return self.pprint()
@@ -261,7 +261,7 @@ class CommaExpr(Expression):
         else [self.expr] + self.comma_expr.getExpressions()
 
     def pprint(self, indent=0):
-        s = f'{" " * indent}Comma Separated Expressions:\n'
+        s = f'{indentation(indent)}Comma Separated Expressions:\n'
 
         expressions = self.getExpressions()
         n = len(expressions)

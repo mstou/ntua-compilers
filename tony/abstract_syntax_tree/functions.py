@@ -1,4 +1,4 @@
-from .node import Node
+from .node import Node, indentation
 
 class FuncDef(Node): # function definition
     def __init__(self, header, functions, stmt, stmtlist):
@@ -66,6 +66,21 @@ class FunctionHeader(Node):
 
         # TODO: 2,3
 
+    def pprint(self, indent=0):
+        s = f'{indentation(indent)}Function Header\n'+\
+            f'{indentation(indent+2)}Name: {self.name}\n'+\
+            f'{indentation(indent+2)}Type: {self.type}\n'+\
+            f'{indentation(indent+2)}Variables:'+\
+            f'{"NONE" if len(self.all_formals) == 0 else ""}\n'
+
+        for formal in self.all_formals:
+            s += indentation(indent+4)
+            s += f'{"REF " if formal.reference else ""}'
+            s += f'{formal.type} '
+            s += ', '.join(formal.names)
+
+    def __str__(self):
+        return self.pprint()
 
 
 class Formal(Node): # variable declaration in function header

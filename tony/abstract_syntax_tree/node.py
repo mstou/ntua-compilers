@@ -25,12 +25,12 @@ class Node:
         '''
         pass
 
-    def __str__(self, depth=1):
-        return_string = [re.sub('\n', lambda _: '\\n', str(self.value))]
-        for child in self.children:
-            return_string.extend(["\n", "  " * (depth+1), child.__str__(depth+1)])
-        return "".join(return_string)
+    def pprint(self, indent=0):
+        return indentation(indent) +\
+               f'Instance of {self.__class__.__name__}'
 
+    def __str__(self):
+        return self.pprint()
 
 
 class Program(Node):
@@ -48,6 +48,15 @@ class Program(Node):
 
         symbol_table.openScope()
         return self.main.sem(symbol_table)
+
+    def pprint(self, indent=0):
+        s = indentation(indent) + 'Program:\n'
+        s += self.main.pprint(indent+2)
+
+        return s
+
+    def __str__(self):
+        return self.pprint()
 
 
 def indentation(indent):

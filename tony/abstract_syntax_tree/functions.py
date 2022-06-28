@@ -22,8 +22,37 @@ class FuncDef(Node): # function definition
                 self.vardefs.append(_def.d)
 
         self.statements = [self.stmt] + self.stmtlist.getStatements()
-        
 
+    def pprint(self, indent=0):
+        s  = indentation(indent)
+        s += 'Function Definition\n'
+        s += self.header.pprint(indent+2)
+
+        if len(self.vardefs) > 0:
+            s += indentation(indent+2) + 'Variable definitions:\n'
+            for var in self.vardefs:
+                s += var.pprint(indent+4) + '\n'
+
+        if len(self.funcdecls) > 0:
+            s += indentation(indent+2) + 'Function Declarations:\n'
+            for decl in self.funcdecls:
+                s += decl.pprint(indent+4) + '\n'
+
+        if len(self.funcdefs) > 0:
+            s += indentation(indent+2) + 'Function Definitions:\n'
+            for d in self.funcdefs:
+                s += d.pprint(indent+4) + '\n'
+
+        s += indentation(indent+2) + 'Statements:\n'
+
+        for i,stmt in enumerate(self.statements):
+            s += stmt.pprint(indent+4)
+            if i != len(self.statements)-1: s += '\n'
+
+        return s
+
+    def __str__(self):
+        return self.pprint()
 
     def sem(self, symbol_table):
         pass
@@ -62,7 +91,7 @@ class FuncDefHelp_VarDef(FuncDefHelp):
 
 class FunctionHeader(Node):
     def __init__(self, type, name, formal, formallist):
-        self.funtion_type = type
+        self.function_type = type
         self.function_name = name
 
         self.all_formals = [] if formal == None else\
@@ -93,16 +122,19 @@ class FunctionHeader(Node):
 
     def pprint(self, indent=0):
         s = f'{indentation(indent)}Function Header\n'+\
-            f'{indentation(indent+2)}Name: {self.name}\n'+\
-            f'{indentation(indent+2)}Type: {self.type}\n'+\
+            f'{indentation(indent+2)}Name: {self.function_name}\n'+\
+            f'{indentation(indent+2)}Return Type: {self.function_type}\n'+\
             f'{indentation(indent+2)}Variables:'+\
             f'{"NONE" if len(self.all_formals) == 0 else ""}\n'
 
-        for formal in self.all_formals:
+        for i,formal in enumerate(self.all_formals):
             s += indentation(indent+4)
             s += f'{"REF " if formal.reference else ""}'
             s += f'{formal.type} '
             s += ', '.join(formal.names)
+            if i == len(self.all_formals)-1 : s += '\n'
+
+        return s
 
     def __str__(self):
         return self.pprint()

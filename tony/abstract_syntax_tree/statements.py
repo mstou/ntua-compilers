@@ -1,4 +1,4 @@
-from .node import Node
+from .node import Node, indentation
 
 class Statement(Node):
     ''' Generic class for statements '''
@@ -8,13 +8,33 @@ class ExitStatement(Statement):
     def __init__(self):
         pass
 
+    def pprint(self, indent=0):
+        return indentation(indent) + f'Exit()'
+
+    def __str__(self):
+        return self.pprint()
+
 class SkipStatment(Statement):
     def __init__(self):
         pass
 
+    def pprint(self, indent=0):
+        return indentation(indent) + f'Skip()'
+
+    def __str__(self):
+        return self.pprint()
+
+
 class ReturnStatement(Statement):
     def __init__(self, expr):
         self.expr = expr
+
+    def pprint(self, indent=0):
+        return indentation(indent) + f'Return\n'+\
+               self.expr.pprint(indent+2)
+
+    def __str__(self):
+        return self.pprint()
 
 class StatementList(Statement):
     def __init__(self, stmt, children):

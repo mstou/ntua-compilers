@@ -1,4 +1,4 @@
-from .node import Node
+from .node import Node, indentation
 
 class VariableDefinition(Node):
     def __init__(self, type, names):
@@ -20,6 +20,14 @@ class VariableDefinition(Node):
             symbol_table.insert(name, self.type)
 
         return True
+
+    def pprint(self, indent=0):
+        return indentation(indent) + f'{self.type} ' +\
+               ', '.join(self.names)
+
+    def __str__(self):
+        return self.pprint()
+
 
 
 class NameList(Node):

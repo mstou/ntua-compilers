@@ -2,12 +2,15 @@ import re
 from enum import Enum
 
 class Type(Enum):
-   Int  = 1
-   Char = 2
-   Bool = 3
-   Void = 4
-   Nil  = 5
-   Function = 6 # TODO: Issue #1
+   Int  = 'int'
+   Char = 'char'
+   Bool = 'bool'
+   Void = 'void'
+   Nil  = 'nil'
+   Function = 'function' # TODO: Issue #1
+
+   def __str__(self):
+       return self.value
 
 class Node:
     def __init__(self, type, value, children=None):

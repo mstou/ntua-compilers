@@ -1,4 +1,7 @@
+import re
 from .node import Node, indentation
+
+escape_newline = lambda x: re.sub('\n', lambda _: '\\n', str(x))
 
 class Atom(Node):
     ''' Generic class for atoms '''
@@ -19,7 +22,7 @@ class StringAtom(Atom):
         self.value = value
 
     def pprint(self, indent=0):
-        return f'{indentation(indent)}{self.value}'
+        return f'{indentation(indent)}{escape_newline(self.value)}'
 
     def __str__(self):
         return self.pprint()

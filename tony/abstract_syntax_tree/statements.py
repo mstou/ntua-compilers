@@ -163,11 +163,34 @@ class IfFullStatement(Statement):
 
 class ForLoop(Statement):
     def __init__(self, initial, condition, ending, stmt, stmtlist):
-        self.initial   = initial
-        self.condition = condition
-        self.ending    = ending
-        self.stmt      = stmt
-        self.stmtlist  = stmtlist
+        self.initial    = initial
+        self.condition  = condition
+        self.ending     = ending
+        self.statements = [stmt] + stmtlist.getStatements()
+
+    def pprint(self, indent=0):
+        s = indentation(indent) + 'For Loop\n'
+
+        s += indentation(indent+2) + 'Initial\n'
+        s += self.initial.pprint(indent+4) + '\n'
+
+        s += indentation(indent+2) + 'Condition\n'
+        s += self.condition.pprint(indent+4) + '\n'
+
+        s += indentation(indent+2) + 'Ending\n'
+        s += self.ending.pprint(indent+4) + '\n'
+
+        s += indentation(indent+2) + 'Statements\n'
+
+        for i,stmt in enumerate(self.statements):
+            s += stmt.pprint(indent+4)
+            if i != len(self.statements)-1: s += '\n'
+
+        return s
+
+
+    def __str__(self):
+        return self.pprint()
 
 class FunctionCall(Statement):
     def __init__(self, name, expressions):

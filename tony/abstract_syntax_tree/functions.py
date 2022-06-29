@@ -132,7 +132,7 @@ class FunctionHeader(Node):
             s += f'{"REF " if formal.reference else ""}'
             s += f'{formal.type} '
             s += ', '.join(formal.names)
-            if i == len(self.all_formals)-1 : s += '\n'
+            s += '\n'
 
         return s
 

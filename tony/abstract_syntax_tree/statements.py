@@ -197,10 +197,36 @@ class FunctionCall(Statement):
         self.name = name
         self.expressions = expressions
 
+    def pprint(self, indent=0):
+        s = indentation(indent) + 'Function Call\n'
+        s += indentation(indent+2) + f'Function Name: {self.name}\n'
+        s += indentation(indent+2) + 'Parameters\n'
+
+        for i,e in enumerate(self.expressions):
+            s += indentation(indent+4) + f'Parameter {i+1}\n'
+            s += e.pprint(indent+6)
+            if i != len(self.expressions)-1: s += '\n'
+
+        return s
+
+    def __str__(self):
+        return self.pprint()
+
 class Assignment(Statement):
     def __init__(self, atom, expr):
         self.atom = atom
         self.expr = expr
+
+    def pprint(self, indent=0):
+        s = indentation(indent) + 'Assignment\n'
+        s += indentation(indent+2) + f'Name: {self.atom}\n'
+        s += indentation(indent+2) + 'Expression\n'
+        s += self.expr.pprint(indent+4)
+
+        return s
+
+    def __str__(self):
+        return self.pprint()
 
 class SimpleListComma(Statement):
     def __init__(self, simple, simplelistcomma):

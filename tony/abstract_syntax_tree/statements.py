@@ -240,3 +240,15 @@ class SimpleListComma(Statement):
 class SimpleList(Statement):
     def __init__(self, simples):
         self.simples = simples
+
+    def pprint(self, indent=0):
+        s = indentation(indent) + 'List of Simples\n'
+
+        for i,sim in enumerate(self.simples):
+            s += sim.pprint(indent+2)
+            if i != len(self.simples)-1: s += '\n'
+
+        return s
+
+    def __str__(self):
+        return self.pprint()

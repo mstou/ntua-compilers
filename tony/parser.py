@@ -1,10 +1,10 @@
 import sys
 import ply.yacc as yacc
-from abstract_syntax_tree import *
-from symbol_table import *
+from .abstract_syntax_tree import *
+from .symbol_table import *
 
 # Get the token map from the lexer.
-from lexer import tokens
+from .lexer import tokens
 
 start = 'program'
 

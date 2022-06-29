@@ -1,5 +1,5 @@
 import pytest
-from parser import parser
+from context import parser
 
 PATH_PREFIX = 'tony-programs/'
 

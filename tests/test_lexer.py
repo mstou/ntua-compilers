@@ -1,5 +1,5 @@
 import pytest
-from lexer import lexer
+from context import lexer
 
 
 def output(lexer, input):

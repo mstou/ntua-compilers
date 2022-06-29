@@ -1,12 +1,11 @@
 from .node import Node, indentation
 
 class Atom(Node):
-    ''' Generic class from atoms '''
+    ''' Generic class for atoms '''
     pass
 
 class VarAtom(Atom):
-    def __init__(self, id, name=None):
-        self.id   = id
+    def __init__(self, name):
         self.name = name
 
     def pprint(self, indent=0):

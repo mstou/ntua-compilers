@@ -5,9 +5,5 @@ before_install:
   - python --version
   - pip install -U pip
   - pip install -U pytest
-  - pip install codecov
-install:
-  - pip install ".[test]" . # install package + test dependencies
+  - pip install -U ply
 script: pytest # run tests
-after_success:
-  - codecov # submit coverage

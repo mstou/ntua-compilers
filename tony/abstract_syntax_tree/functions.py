@@ -116,7 +116,7 @@ class FunctionHeader(Node):
 
             raise Exception(error_msg)
 
-        symbol_table.insert(name, Type.Function)
+        symbol_table.insert(name, BaseType.Function)
 
         # TODO: 2,3
 

@@ -64,12 +64,12 @@ class Not(Expression):
     def sem(self, symbol_table):
         t = self.expr.sem()
 
-        if t != Type.Bool:
+        if t != BaseType.Bool:
             error_msg = f'Expected the operand of not\
             to be of type Bool but {t} was given.'
             raise Exception(error_msg)
 
-        return Type.Bool
+        return BaseType.Bool
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}not\n'+\
@@ -100,7 +100,7 @@ class IntValue(Expression):
         return self.data
 
     def sem(self, symbol_table):
-        return Type.Int
+        return BaseType.Int
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'
@@ -116,7 +116,7 @@ class BooleanValue(Expression):
         return self.data
 
     def sem(self, symbol_table):
-        return Type.Bool
+        return BaseType.Bool
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'
@@ -132,7 +132,7 @@ class CharValue(Expression):
         return self.data
 
     def sem(self, symbol_table):
-        return Type.Char
+        return BaseType.Char
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'
@@ -159,7 +159,7 @@ class UniArithmeticPLUS(Expression):
     def sem(self, symbol_table):
         t = self.expr.sem()
 
-        if t != Type.Int:
+        if t != BaseType.Int:
             error_msg = f'Can not use unary "+"\
             with type {t}'
 
@@ -181,7 +181,7 @@ class UniArithmeticMINUS(Expression):
     def sem(self, symbol_table):
         t = self.expr.sem()
 
-        if t != Type.Int:
+        if t != BaseType.Int:
             error_msg = f'Can not use unary "-"\
             with type {t}'
 

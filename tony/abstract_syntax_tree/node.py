@@ -1,16 +1,3 @@
-from enum import Enum
-
-class Type(Enum):
-   Int  = 'int'
-   Char = 'char'
-   Bool = 'bool'
-   Void = 'void'
-   Nil  = 'nil'
-   Function = 'function' # TODO: Issue #1
-
-   def __str__(self):
-       return self.value
-
 class Node:
     def __init__(self, type, value, children=None):
         self.type = type

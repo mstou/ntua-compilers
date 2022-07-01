@@ -30,10 +30,35 @@ class ParenthesisExpr(Expression):
         return self.pprint()
 
 class BinaryOperator(Expression):
+    ''' Node for binary arithmetic expressions.
+        Operators are: +, -, *, /, %
+    '''
     def __init__(self, left, op, right):
         self.left  = left
         self.op    = op
         self.right = right
+
+    def sem(self, symbol_table):
+        '''
+            1) Calls the sem() function of the left and right expressions
+               to get their types.
+
+            2) Checks that the types are compatible and it raises an
+               Exception if they are not.
+
+            3) Returns the type of the expression.
+        '''
+
+        t1 = self.left.sem(symbol_table)
+        t2 = self.right.sem(symbol_table)
+
+        if t1 != BaseType.Int or t2 != BaseType.Int:
+            errormsg = f'Invalid operants. Operator {self.op}\
+                         can not be used with {t1} and {t2}.'
+
+            raise Exception(errormsg)
+
+        return BaseType.Int
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\

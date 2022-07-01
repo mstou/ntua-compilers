@@ -21,10 +21,11 @@ class ParenthesisExpr(Expression):
         self.expr = expr
 
     def sem(self, symbol_table):
-        return self.expr.sem()
+        return self.expr.sem(symbol_table)
 
     def pprint(self, indent = 0):
-        return f'{indentation(indent)}({self.expr})'
+        return indentation(indent) + 'Parenthesis\n' +\
+               self.expr.pprint(indentation+2) + '\n'
 
     def __str__(self, ):
         return self.pprint()
@@ -118,7 +119,7 @@ class Not(Expression):
         self.expr  = expr
 
     def sem(self, symbol_table):
-        t = self.expr.sem()
+        t = self.expr.sem(symbol_table)
 
         if t != BaseType.Bool:
             error_msg = f'Expected the operand of not\
@@ -238,7 +239,7 @@ class UniArithmeticPLUS(Expression):
         self.expr = expr
 
     def sem(self, symbol_table):
-        t = self.expr.sem()
+        t = self.expr.sem(symbol_table)
 
         if t != BaseType.Int:
             error_msg = f'Can not use unary "+"\
@@ -260,7 +261,7 @@ class UniArithmeticMINUS(Expression):
         self.expr = expr
 
     def sem(self, symbol_table):
-        t = self.expr.sem()
+        t = self.expr.sem(symbol_table)
 
         if t != BaseType.Int:
             error_msg = f'Can not use unary "-"\

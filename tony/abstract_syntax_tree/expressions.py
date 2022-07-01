@@ -69,10 +69,41 @@ class BinaryOperator(Expression):
         return self.pprint()
 
 class BinaryComparison(Expression):
+    ''' Node for binary comparisons.
+        Operators are: =, <>, <, >, <=, >=
+    '''
     def __init__(self, left, op, right):
         self.left  = left
         self.op    = op
         self.right = right
+
+    def sem(self, symbol_table):
+        '''
+            1) Calls the sem() function of the left and right expressions
+               to get their types.
+
+            2) Checks that the types are compatible and it raises an
+               Exception if they are not. For = and <> the operants
+               must be of the same BaseType. For >, <, <=, >= the operants
+               must be BaseType.Int or BaseType.Char
+
+            3) Returns the type of the expression.
+        '''
+
+        t1 = self.left.sem(symbol_table)
+        t2 = self.right.sem(symbol_table)
+
+        if t1 != t2 or t1 not in [BaseType.Int, BaseType.Bool, BaseType.Char]:
+            errormsg = f'Invalid operants. Operator {self.op}\
+                         can not be used with {t1} and {t2}.'
+            raise Exception(errormsg)
+
+        if self.op in ['>', '<', '>=', '<='] and t1 == BaseType.Bool:
+            errormsg = f'Operator {self.op} is not supported for Booleans.'
+
+            raise Exception(errormsg)
+
+        return BaseType.Bool
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\
@@ -104,10 +135,35 @@ class Not(Expression):
         return self.pprint()
 
 class BinaryBoolean(Expression):
+    ''' Node for binary logical expressions.
+        Operators are: and, or
+    '''
     def __init__(self, left, op, right):
         self.left  = left
         self.op    = op
         self.right = right
+
+    def sem(self, symbol_table):
+        '''
+            1) Calls the sem() function of the left and right expressions
+               to get their types.
+
+            2) Checks that the types are compatible and it raises an
+               Exception if they are not.
+
+            3) Returns the type of the expression.
+        '''
+
+        t1 = self.left.sem(symbol_table)
+        t2 = self.right.sem(symbol_table)
+
+        if t1 != BaseType.Bool or t2 != BaseType.Bool:
+            errormsg = f'Invalid operants. Operator {self.op}\
+                         can not be used with {t1} and {t2}.'
+
+            raise Exception(errormsg)
+
+        return BaseType.Bool
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\

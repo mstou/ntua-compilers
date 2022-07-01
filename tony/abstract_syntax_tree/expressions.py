@@ -295,6 +295,19 @@ class isEmptyList(Expression):
     def __init__(self, expr):
         self.expr = expr
 
+    def sem(self, symbol_table):
+        '''
+            Checks that the given expression is a list.
+        '''
+        expr_type = self.expr.sem(symbol_table)
+
+        if expr_type != BaseType.Nil and not isinstance(expr_type, List.__class__):
+            errormsg = f'nil? expects a list as a parameter but a {expr_type}\
+                        was given.'
+            raise Exception(errormsg)
+
+        return BaseType.Bool
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}nil?\n'+\
                self.expr.pprint(indent=indent+2)
@@ -307,18 +320,56 @@ class ListOperator(Expression):
         self.head = left
         self.tail = right
 
+    def sem(self, symbol_table):
+        '''
+            1) Find the type of the head and checks that the tail is either an
+               empty list or a list of that type.
+
+            2) Returns the type of the list
+        '''
+
+        head_type = self.head.sem(symbol_table)
+        tail_type = self.tail.sem(symbol_table)
+
+        if tail_type != BaseType.Nil and tail_type != List(head_type):
+            errormsg = f'Incompatible types of head and tail. Expected\
+                        {List(head_type)} but got {tail_type} instead.'
+
+            raise Exception(errormsg)
+
+        return List(head_type)
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}new list with (head,tail):\n'+\
                self.head.pprint(indent=indent+2)+'\n'+\
                self.tail.pprint(indent=indent+2)
 
+    def __str__(self):
+        return self.pprint()
+
 class TailOperator(Expression):
     def __init__(self, expr):
         self.expr = expr
 
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the given expression is a list and not BaseType.Nil
+
+            2) Returns the type of the list
+        '''
+
+        t = self.expr.sem(symbol_table)
+
+        if not isistance(t, List.__class__):
+            errormsg = f'Tail operator can not be used with type {t}.'
+            raise Exception(errormsg)
+
+        return t
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}tail of\n'+\
                self.expr.pprint(indent=indent+2)
+
     def __str__(self):
         return self.pprint()
 
@@ -326,9 +377,25 @@ class HeadOperator(Expression):
     def __init__(self, expr):
         self.expr = expr
 
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the given expression is a list and not BaseType.Nil
+
+            2) Returns the type of the list
+        '''
+
+        t = self.expr.sem(symbol_table)
+
+        if not isistance(t, List.__class__):
+            errormsg = f'Head operator can not be used with type {t}.'
+            raise Exception(errormsg)
+
+        return t.t # list subtype
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}head of\n'+\
                self.expr.pprint(indent=indent+2)
+
     def __str__(self):
         return self.pprint()
 
@@ -340,6 +407,14 @@ class CommaExpr(Expression):
     def getExpressions(self):
         return [] if self.expr == None\
         else [self.expr] + self.comma_expr.getExpressions()
+
+    def sem(self, symbol_table):
+        ''' This is not implemented and will never be called.
+            The CommaExpr is only used for Function Calls where
+            we will call the sem() function of each expression
+            separately.
+        '''
+        pass
 
     def pprint(self, indent=0):
         s = f'{indentation(indent)}Comma Separated Expressions:\n'

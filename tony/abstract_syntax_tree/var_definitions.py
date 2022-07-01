@@ -8,9 +8,9 @@ class VariableDefinition(Node):
 
     def sem(self, symbol_table):
         '''
-        1) Checks that the name does not already exist in the scope
+            1) Checks that the name does not already exist in the scope
 
-        2) Inserts the variable to the current scope
+            2) Inserts the variable to the current scope
         '''
         for name in self.names:
             if symbol_table.lookup_current_scope(name) != None:
@@ -19,7 +19,7 @@ class VariableDefinition(Node):
 
             symbol_table.insert(name, self.type)
 
-        return True
+        return self.type
 
     def pprint(self, indent=0):
         return indentation(indent) + f'{self.type} ' +\

@@ -31,3 +31,145 @@ def test_simple_comparison_expression():
     a3 = BinaryComparison(a2, '<', IntValue(73))
 
     assert a3.sem(SymbolTable()) == BaseType.Bool
+
+@pytest.mark.semantics
+def test_equality_expressions():
+    i1 = IntValue(73)
+    i2 = IntValue(42)
+
+    c1 = CharValue('a')
+    c2 = CharValue('b')
+
+    b1 = BooleanValue(False)
+    b2 = BooleanValue(True)
+
+    assert BinaryComparison(i1, '=', i2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(c1, '=', c2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(b1, '=', b2).sem(SymbolTable()) == BaseType.Bool
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '=', c1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '=', b1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(b1, '=', c1).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_inequality_expressions():
+    i1 = IntValue(73)
+    i2 = IntValue(42)
+
+    c1 = CharValue('a')
+    c2 = CharValue('b')
+
+    b1 = BooleanValue(False)
+    b2 = BooleanValue(True)
+
+    assert BinaryComparison(i1, '<>', i2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(c1, '<>', c2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(b1, '<>', b2).sem(SymbolTable()) == BaseType.Bool
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '<>', c1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '<>', b1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(b1, '<>', c1).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_less_that_expressions():
+    i1 = IntValue(73)
+    i2 = IntValue(42)
+
+    c1 = CharValue('a')
+    c2 = CharValue('b')
+
+    b1 = BooleanValue(False)
+    b2 = BooleanValue(True)
+
+    assert BinaryComparison(i1, '<', i2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(c1, '<', c2).sem(SymbolTable()) == BaseType.Bool
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '<', c1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '<', b1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(b1, '<', c1).sem(SymbolTable())
+
+
+@pytest.mark.semantics
+def test_leq_expressions():
+    i1 = IntValue(73)
+    i2 = IntValue(42)
+
+    c1 = CharValue('a')
+    c2 = CharValue('b')
+
+    b1 = BooleanValue(False)
+    b2 = BooleanValue(True)
+
+    assert BinaryComparison(i1, '<=', i2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(c1, '<=', c2).sem(SymbolTable()) == BaseType.Bool
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '<=', c1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '<=', b1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(b1, '<=', c1).sem(SymbolTable())
+
+
+@pytest.mark.semantics
+def test_greater_than_expressions():
+    i1 = IntValue(73)
+    i2 = IntValue(42)
+
+    c1 = CharValue('a')
+    c2 = CharValue('b')
+
+    b1 = BooleanValue(False)
+    b2 = BooleanValue(True)
+
+    assert BinaryComparison(i1, '>', i2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(c1, '>', c2).sem(SymbolTable()) == BaseType.Bool
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '>', c1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '>', b1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(b1, '>', c1).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_geq_expressions():
+    i1 = IntValue(73)
+    i2 = IntValue(42)
+
+    c1 = CharValue('a')
+    c2 = CharValue('b')
+
+    b1 = BooleanValue(False)
+    b2 = BooleanValue(True)
+
+    assert BinaryComparison(i1, '>=', i2).sem(SymbolTable()) == BaseType.Bool
+    assert BinaryComparison(c1, '>=', c2).sem(SymbolTable()) == BaseType.Bool
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '>=', c1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i1, '>=', b1).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(b1, '>=', c1).sem(SymbolTable())

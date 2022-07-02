@@ -8,6 +8,9 @@ class ExitStatement(Statement):
     def __init__(self):
         pass
 
+    def sem(self, symbol_table):
+        return True
+
     def pprint(self, indent=0):
         return indentation(indent) + f'Exit()'
 
@@ -17,6 +20,9 @@ class ExitStatement(Statement):
 class SkipStatment(Statement):
     def __init__(self):
         pass
+
+    def sem(self, symbol_table):
+        return True
 
     def pprint(self, indent=0):
         return indentation(indent) + f'Skip()'
@@ -28,6 +34,9 @@ class SkipStatment(Statement):
 class ReturnStatement(Statement):
     def __init__(self, expr):
         self.expr = expr
+
+    def sem(self, symbol_table):
+        return self.expr.sem(symbol_table)
 
     def pprint(self, indent=0):
         return indentation(indent) + f'Return\n'+\
@@ -50,6 +59,21 @@ class IfStatement(Statement):
         self.condition = condition
         self.statements = [statement] + stmtlist.getStatements()
 
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the condition is BaseType.Bool
+            2) Calls the sem() of each statement
+        '''
+        t = self.condition.sem(symbol_table)
+        if t != BaseType.Bool:
+            errormsg = f'The condition of the if clause must be of type {BaseType.Bool}'
+            raise Exception(errormsg)
+
+        for s in self.statements:
+            s.sem(symbol_table)
+
+        return True
+
     def pprint(self, indent=0):
         s = indentation(indent) + 'If Statement\n'
         s += indentation(indent+2) + 'Condition\n'
@@ -70,6 +94,16 @@ class ElseStatement(Statement):
     def __init__(self, statement, stmtlist):
         self.statements = [statement] + stmtlist.getStatements()
 
+    def sem(self, symbol_table):
+        '''
+            Calls the sem() of each statement
+        '''
+
+        for s in statements:
+            s.sem(symbol_table)
+
+        return True
+
     def pprint(self, indent=0):
         s = indentation(indent) + 'Else Statement\n'
         s += indentation(indent+2) + 'Statements\n'
@@ -87,6 +121,21 @@ class ElsifStatement(Statement):
     def __init__(self, condition, statement, stmtlist):
         self.condition  = condition
         self.statements = [statement] + stmtlist.getStatements()
+
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the condition is BaseType.Bool
+            2) Calls the sem() of each statement
+        '''
+        t = self.condition.sem(symbol_table)
+        if t != BaseType.Bool:
+            errormsg = f'The condition of the if clause must be of type {BaseType.Bool}'
+            raise Exception(errormsg)
+
+        for s in self.statements:
+            s.sem(symbol_table)
+
+        return True
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'ElseIf Statement\n'
@@ -117,6 +166,17 @@ class IfElsifStatement(Statement):
         self.ifclause = ifclause
         self.elsifs   = elsiflist.getClauses() # list of ElsifStatement
 
+    def sem(self, symbol_table):
+        '''
+            Calls the sem() of all the clauses
+        '''
+        self.ifclause.sem(symbol_table)
+
+        for eif in self.elsifs:
+            eif.sem(symbol_table)
+
+        return True
+
     def pprint(self, indent=0):
         s = self.ifclause.pprint(indent) + '\n'
 
@@ -134,6 +194,16 @@ class IfElseStatement(Statement):
         self.ifclause    = ifclause
         self.else_clause = else_clause
 
+    def sem(self, symbol_table):
+        '''
+            Calls the sem() of all the clauses
+        '''
+
+        self.ifclause.sem(symbol_table)
+        self.else_clause.sem(symbol_table)
+
+        return True
+
     def pprint(self, indent=0):
         return self.ifclause.pprint(indent) +\
                '\n' + self.else_clause.pprint(indent)
@@ -146,6 +216,20 @@ class IfFullStatement(Statement):
         self.ifclause    = ifclause
         self.else_clause = else_clause
         self.elsifs      = elsiflist.getClauses()
+
+
+    def sem(self, symbol_table):
+        '''
+            Calls the sem() of all the clauses
+        '''
+        self.ifclause.sem(symbol_table)
+
+        for eif in self.elsifs:
+            eif.sem(symbol_table)
+
+        self.else_clause.sem(symbol_table)
+
+        return True
 
     def pprint(self, indent=0):
         s = self.ifclause.pprint(indent) + '\n'

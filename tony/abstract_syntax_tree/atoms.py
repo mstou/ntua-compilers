@@ -16,11 +16,11 @@ class VarAtom(Atom):
             if it exists in some scope, otherwise it raises an Exception.
         '''
         t = symbol_table.lookup(self.name)
+
         if t != None:
-            return t
+            return t.type
 
         raise Exception(f'Undefined variable {self.name}.')
-
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.name}'

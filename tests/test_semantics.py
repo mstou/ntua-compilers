@@ -173,3 +173,154 @@ def test_geq_expressions():
 
     with pytest.raises(Exception):
         BinaryComparison(b1, '>=', c1).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_arithmetic_expr_undefined_var():
+    i = IntValue(73)
+    x = VarAtom('x')
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '+', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '-', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '*', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '/', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, 'mod', x).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_logic_expr_undefined_var():
+    b = BooleanValue(True)
+    x = VarAtom('x')
+
+    with pytest.raises(Exception):
+        BinaryBoolean(b, 'and', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryBoolean(b, 'or', x).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_comparison_expr_undefined_var():
+    i = IntValue(73)
+    x = VarAtom('x')
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '<', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '>', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '<=', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '>=', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '=', x).sem(SymbolTable())
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '<>', x).sem(SymbolTable())
+
+@pytest.mark.semantics
+def test_arithmetic_expr_defined_var_wrong_type():
+    i = IntValue(73)
+    x = VarAtom('x')
+    s = SymbolTable()
+    s.insert('x', BaseType.Bool)
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '+', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '-', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '*', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, '/', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryOperator(i, 'mod', x).sem(s)
+
+@pytest.mark.semantics
+def test_logic_expr_defined_var_wrong_type():
+    b = BooleanValue(True)
+    x = VarAtom('x')
+    s = SymbolTable()
+    s.insert('x', BaseType.Char)
+
+    with pytest.raises(Exception):
+        BinaryBoolean(b, 'and', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryBoolean(b, 'or', x).sem(s)
+
+@pytest.mark.semantics
+def test_comparison_expr_defined_var_wrong_type():
+    i = IntValue(73)
+    x = VarAtom('x')
+    s = SymbolTable()
+    s.insert('x', BaseType.Bool)
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '<', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '>', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '<=', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '>=', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '=', x).sem(s)
+
+    with pytest.raises(Exception):
+        BinaryComparison(i, '<>', x).sem(s)
+
+@pytest.mark.semantics
+def test_arithmetic_expr_defined_var_correct_type():
+    i = IntValue(73)
+    x = VarAtom('x')
+    s = SymbolTable()
+    s.insert('x', BaseType.Int)
+
+    assert BinaryOperator(i, '+', x).sem(s)   == BaseType.Int
+    assert BinaryOperator(i, '-', x).sem(s)   == BaseType.Int
+    assert BinaryOperator(i, '*', x).sem(s)   == BaseType.Int
+    assert BinaryOperator(i, '/', x).sem(s)   == BaseType.Int
+    assert BinaryOperator(i, 'mod', x).sem(s) == BaseType.Int
+
+@pytest.mark.semantics
+def test_logic_expr_defined_var_correct_type():
+    b = BooleanValue(True)
+    x = VarAtom('x')
+    s = SymbolTable()
+    s.insert('x', BaseType.Bool)
+
+    assert BinaryBoolean(b, 'and', x).sem(s) == BaseType.Bool
+    assert BinaryBoolean(b, 'or', x).sem(s)  == BaseType.Bool
+
+@pytest.mark.semantics
+def test_comparison_expr_defined_var_correct_type():
+    i = IntValue(73)
+    x = VarAtom('x')
+    s = SymbolTable()
+    s.insert('x', BaseType.Int)
+
+    assert BinaryComparison(i, '<', x).sem(s)  == BaseType.Bool
+    assert BinaryComparison(i, '>', x).sem(s)  == BaseType.Bool
+    assert BinaryComparison(i, '<=', x).sem(s) == BaseType.Bool
+    assert BinaryComparison(i, '>=', x).sem(s) == BaseType.Bool
+    assert BinaryComparison(i, '=', x).sem(s)  == BaseType.Bool
+    assert BinaryComparison(i, '<>', x).sem(s) == BaseType.Bool

@@ -55,8 +55,8 @@ class BinaryOperator(Expression):
         t2 = self.right.sem(symbol_table)
 
         if t1 != BaseType.Int or t2 != BaseType.Int:
-            errormsg = f'Invalid operants. Operator {self.op}\
-                         can not be used with {t1} and {t2}.'
+            errormsg = f'Invalid operants. Operator {self.op}' +\
+                       f'can not be used with {t1} and {t2}.'
 
             raise Exception(errormsg)
 
@@ -96,8 +96,8 @@ class BinaryComparison(Expression):
         t2 = self.right.sem(symbol_table)
 
         if t1 != t2 or t1 not in [BaseType.Int, BaseType.Bool, BaseType.Char]:
-            errormsg = f'Invalid operants. Operator {self.op}\
-                         can not be used with {t1} and {t2}.'
+            errormsg = f'Invalid operants. Operator {self.op}' +\
+                       f'can not be used with {t1} and {t2}.'
             raise Exception(errormsg)
 
         if self.op in ['>', '<', '>=', '<='] and t1 == BaseType.Bool:
@@ -160,8 +160,8 @@ class BinaryBoolean(Expression):
         t2 = self.right.sem(symbol_table)
 
         if t1 != BaseType.Bool or t2 != BaseType.Bool:
-            errormsg = f'Invalid operants. Operator {self.op}\
-                         can not be used with {t1} and {t2}.'
+            errormsg = f'Invalid operants. Operator {self.op}' +\
+                       f'can not be used with {t1} and {t2}.'
 
             raise Exception(errormsg)
 
@@ -304,8 +304,7 @@ class isEmptyList(Expression):
         expr_type = self.expr.sem(symbol_table)
 
         if expr_type != BaseType.Nil and not isinstance(expr_type, List.__class__):
-            errormsg = f'nil? expects a list as a parameter but a {expr_type}\
-                        was given.'
+            errormsg = f'nil? expects a list as a parameter but a {expr_type} was given.'
             raise Exception(errormsg)
 
         return BaseType.Bool
@@ -334,8 +333,8 @@ class ListOperator(Expression):
         tail_type = self.tail.sem(symbol_table)
 
         if tail_type != BaseType.Nil and tail_type != List(head_type):
-            errormsg = f'Incompatible types of head and tail. Expected\
-                        {List(head_type)} but got {tail_type} instead.'
+            errormsg = f'Incompatible types of head and tail. Expected' +\
+                       f'{List(head_type)} but got {tail_type} instead.'
 
             raise Exception(errormsg)
 

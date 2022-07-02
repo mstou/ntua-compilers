@@ -252,6 +252,26 @@ class ForLoop(Statement):
         self.ending     = ending
         self.statements = [stmt] + stmtlist.getStatements()
 
+    def sem(self, symbol_table):
+        '''
+            1) Calls sem() on the initial and ending simple list and all the
+               statements
+            2) Checks that the terminating condition is of type BaseType.Bool
+        '''
+
+        t = self.condition.sem(symbol_table)
+        if t != BaseType.Bool:
+            errormsg = f'The terminating condition of the for-loop must be of type {BaseType.Bool}'
+            raise Exception(errormsg)
+
+        self.initial.sem(symbol_table)
+        self.ending.sem(symbol_table)
+
+        for s in self.statements:
+            s.sem(symbol_table)
+
+        return True
+
     def pprint(self, indent=0):
         s = indentation(indent) + 'For Loop\n'
 
@@ -301,6 +321,27 @@ class Assignment(Statement):
         self.atom = atom
         self.expr = expr
 
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the atom is a variable name
+            2) Checks that the variable is already defined and has the
+               same type with the given expression
+        '''
+
+        expr_type = self.expr.sem(symbol_table)
+
+        if not isistance(self.atom, VarAtom.__class__):
+            errormsg = f'The left-hand side of an assignment can only be a variable.'
+            raise Exception(errormsg)
+
+        var_type = self.atom.sem(symbol_table)
+
+        if var_type != expr_type:
+            errormsg = f'Unsupported assignment between {var_type} and {expr_type}'
+            raise Exception(errormsg)
+
+        return True
+
     def pprint(self, indent=0):
         s = indentation(indent) + 'Assignment\n'
         s += indentation(indent+2) + f'Name: {self.atom}\n'
@@ -324,6 +365,15 @@ class SimpleListComma(Statement):
 class SimpleList(Statement):
     def __init__(self, simples):
         self.simples = simples
+
+    def sem(self, symbol_table):
+        '''
+            Calls the sem() function on all the simples
+        '''
+        for s in self.simples:
+            s.sem(symbol_table)
+
+        return True
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'List of Simples\n'

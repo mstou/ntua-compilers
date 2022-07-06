@@ -233,7 +233,7 @@ def test_arithmetic_expr_defined_var_wrong_type():
     i = IntValue(73)
     x = VarAtom('x')
     s = SymbolTable()
-    s.insert('x', BaseType.Bool)
+    s.insert('x', Variable('x', BaseType.Bool))
 
     with pytest.raises(Exception):
         BinaryOperator(i, '+', x).sem(s)
@@ -255,7 +255,7 @@ def test_logic_expr_defined_var_wrong_type():
     b = BooleanValue(True)
     x = VarAtom('x')
     s = SymbolTable()
-    s.insert('x', BaseType.Char)
+    s.insert('x', Variable('x', BaseType.Char))
 
     with pytest.raises(Exception):
         BinaryBoolean(b, 'and', x).sem(s)
@@ -268,7 +268,7 @@ def test_comparison_expr_defined_var_wrong_type():
     i = IntValue(73)
     x = VarAtom('x')
     s = SymbolTable()
-    s.insert('x', BaseType.Bool)
+    s.insert('x', Variable('x', BaseType.Bool))
 
     with pytest.raises(Exception):
         BinaryComparison(i, '<', x).sem(s)
@@ -293,7 +293,7 @@ def test_arithmetic_expr_defined_var_correct_type():
     i = IntValue(73)
     x = VarAtom('x')
     s = SymbolTable()
-    s.insert('x', BaseType.Int)
+    s.insert('x', Variable('x', BaseType.Int))
 
     assert BinaryOperator(i, '+', x).sem(s)   == BaseType.Int
     assert BinaryOperator(i, '-', x).sem(s)   == BaseType.Int
@@ -306,7 +306,7 @@ def test_logic_expr_defined_var_correct_type():
     b = BooleanValue(True)
     x = VarAtom('x')
     s = SymbolTable()
-    s.insert('x', BaseType.Bool)
+    s.insert('x', Variable('x', BaseType.Bool))
 
     assert BinaryBoolean(b, 'and', x).sem(s) == BaseType.Bool
     assert BinaryBoolean(b, 'or', x).sem(s)  == BaseType.Bool
@@ -316,7 +316,7 @@ def test_comparison_expr_defined_var_correct_type():
     i = IntValue(73)
     x = VarAtom('x')
     s = SymbolTable()
-    s.insert('x', BaseType.Int)
+    s.insert('x', Variable('x', BaseType.Int))
 
     assert BinaryComparison(i, '<', x).sem(s)  == BaseType.Bool
     assert BinaryComparison(i, '>', x).sem(s)  == BaseType.Bool

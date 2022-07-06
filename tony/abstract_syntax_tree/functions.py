@@ -60,7 +60,7 @@ class FuncDef(Node): # function definition
 
 class FuncDecl(Node): # function definition
     def __init__(self, header):
-        self.header = header       # type FunctionHeader
+        self.header = header
 
 class FuncDefHelp(Node): # function definitions recursively
     def __init__(self, d, child):
@@ -90,35 +90,82 @@ class FuncDefHelp_VarDef(FuncDefHelp):
 
 
 class FunctionHeader(Node):
-    def __init__(self, type, name, formal, formallist):
+    def __init__(self, type, name, formal, formallist, decl=False):
         self.function_type = type
         self.function_name = name
 
         self.all_formals = [] if formal == None else\
                            [formal] + formallist.getFormals()
+        self.params = []
+        for f in self.all_formals:
+            for name in f.names:
+                self.params.append((name, f.type, f.reference))
 
-    def sem(self, symbol_table):
+
+    def sem(self, symbol_table, decl = False):
         '''
-        1) Inserts the function with its type to the current scope
-           after checking that the name is not already used
+        We may have arrived here either from a declaration or
+        from a function definition.
 
-        2) Opens a new function scope
+        In the case of a function declaration:
+            1a) We check that the function has not already been declared
+            1b) We add the function to the symbol table and label it undefined
 
-        3) Inserts all the variables in the scope and
-           checks that there are no duplicates (e.g. the same
-           name given for two or more parameters)
+        In the case of a function definition:
+            2a) If a symbol entry exists, we check that the function is undefined,
+                hence the entry was produced from a declaration
+            2b) We create (or modify) an entry for the function in the current scope
+               (which is the global scope, or one above the function scope).
+            2c) We open a new scope and insert all the parameters of the function
+
+        In any case we also check that the names of the parameters are correct,
+        i.e. two parameters can not share the same name
         '''
 
-        if symbol_table.lookup(self.function_name) != None:
-            error_msg = f'Syntax error. Tried to define a function\
-            name {self.function_name}, but {self.function_name} is\
-            already in use'
+        param_names = set()
+        for p in self.params:
+            name, _, _ = p
+            if name in param_names:
+                errormsg = f'Two or more parameters share the name {name}'
+                raise Exception(errormsg)
+            param_names.insert(name)
 
-            raise Exception(error_msg)
 
-        symbol_table.insert(name, BaseType.Function)
+        entry = symbol_table.lookup(self.function_name)
+        if decl:
+            errormsg = f'Tried to declare a function with name {self.name} ' +\
+                        'but the name is already in use.'
+            raise Exception(errormsg)
 
-        # TODO: 2,3
+            new_entry = Function(self.function_name, self.function_type, self.params)
+            symbol_table.insert(self.function_name, new_entry, defined=False)
+
+            return True
+
+        else:
+            if entry != None and not isinstance(entry, Function.__class__):
+                errormsg = f'Tried to define a function with name {self.name} ' +\
+                            'but the name is already in use.'
+                raise Exception(errormsg)
+
+            if entry != None and entry.defined:
+                errormsg = f'A function with name {self.name} ' +\
+                            'has already been defined.'
+                raise Exception(errormsg)
+
+            if entry != None and not entry.defined:
+                entry.defined = True
+
+            else:
+                new_entry = Function(self.function_name, self.function_type, self.params)
+                symbol_table.insert(self.function_name, new_entry, defined=True)
+
+                symbol_table.openScope()
+
+                for n,t,ref in params:
+                    symbol_table.insert(n, FunctionParam(n,t,ref))
+
+            return True
 
     def pprint(self, indent=0):
         s = f'{indentation(indent)}Function Header\n'+\

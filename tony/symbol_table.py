@@ -20,12 +20,12 @@ class FunctionParam(SymbolEntry):
                f'{"ref" if self.reference else ""} {self.type}'
 
 class Function(SymbolEntry):
-    def __init__(self, name, type, params):
+    def __init__(self, name, type, params, defined=False):
         # params is an array of tuples: (name, type, reference)
         self.func_name   = name
         self.return_type = type
         self.params      = params
-        self.defined     = False   # to distinguish functions that are declared
+        self.defined     = defined # to distinguish functions that are declared
                                    # but not yet defined
     def __str__(self):
         s = f'{"Undefined" if not self.defined else ""} Function with:\n'

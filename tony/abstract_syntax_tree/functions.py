@@ -62,6 +62,18 @@ class FuncDecl(Node): # function definition
     def __init__(self, header):
         self.header = header
 
+    def sem(self, symbol_table):
+        return self.header.sem(symbol_table)
+    
+    def pprint(self, indent=0):
+        s = indentation(indent)
+        s += f'Function Declaration:\n'
+        s += self.header.pprint(indent+2)
+        return s
+
+    def __str__(self):
+        return self.pprint()
+
 class FuncDefHelp(Node): # function definitions recursively
     def __init__(self, d, child):
         self.d = d

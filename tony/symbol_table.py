@@ -1,10 +1,38 @@
 class SymbolEntry:
-    def __init__(self, type, ref=False):
-        self.type      = type
-        self.reference = ref
+    ''' Abstract class for entries of the Symbol Table '''
+
+class Variable(SymbolEntry):
+    def __init__(self, type):
+        self.type  = type
+        self.name  = name
 
     def __str__(self):
-        return f'{"ref" if self.reference else ""} {self.type}'
+        return f'Variable {self.name} of type {self.type}'
+
+class FunctionParam(SymbolEntry):
+    def __init__(self, type, name, reference=False):
+        self.type = type
+        self.name = name
+        self.reference = reference
+
+    def __str__(self):
+        return f'Function parameter {self.name} of type'+\
+               f'{"ref" if self.reference else ""} {self.type}'
+
+class Function(SymbolEntry):
+    def __init__(self, name, type, params):
+        # params is an array of tuples: (name, type, reference)
+        self.func_name   = name
+        self.return_type = type
+        self.params      = params
+        self.defined     = False   # to distinguish function that are declared
+                                   # but not yet defined
+    def __str__(self):
+        s = f'{"Undefined" if not self.defined else ""} Function with:\n'
+        s += f'\tFunction name: {self.func_name}\n'
+        s += f'\tReturn type: {self.return_type}\n'
+        s += f'\tParameters: ' + ' ,'.join(list(map(str, self.params)))
+        return s
 
 class Scope:
     def __init__(self):

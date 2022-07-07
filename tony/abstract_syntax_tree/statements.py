@@ -1,4 +1,6 @@
-from .node import Node, indentation
+from .node         import Node, indentation
+from .symbol_table import *
+from .data_types   import *
 
 class Statement(Node):
     ''' Generic class for statements '''
@@ -300,6 +302,42 @@ class FunctionCall(Statement):
     def __init__(self, name, expressions):
         self.name = name
         self.expressions = expressions
+
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the function exists
+            2) Checks that all the parameters are of the expected type
+            3) Checks that parameters passed by reference are l-values
+        '''
+
+        # TODO 3
+
+        print('in here')
+
+        f = symbol_table.lookup(self.name)
+
+        if f == None:
+            errormsg = f'Function {self.name} is not defined'
+            raise Exception(errormsg)
+
+        if not isinstance(f, FunctionEntry):
+            errormsg = f'{self.name} is not a function'
+            raise Exception(errormsg)
+
+        params = f.params
+
+        for e, param in zip(self.expressions,params):
+            expected_type = param[1]
+            actual_type = e.sem(symbol_table)
+
+            if expected_type != actual_type:
+                errormsg = f'Expected a parameter of type {expected_type}' +\
+                           f'but got {actual_type} instead'
+                raise Exception(errormsg)
+
+        return f.return_type
+
+
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'Function Call\n'

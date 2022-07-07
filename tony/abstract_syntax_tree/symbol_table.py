@@ -1,4 +1,4 @@
-from .abstract_syntax_tree import BaseType, Array
+from .data_types import BaseType, Array
 
 class SymbolEntry:
     ''' Abstract class for entries of the Symbol Table '''

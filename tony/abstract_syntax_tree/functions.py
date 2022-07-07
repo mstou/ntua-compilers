@@ -1,4 +1,5 @@
-from .node import Node, indentation
+from .node         import Node, indentation
+from .symbol_table import *
 
 class FuncDef(Node): # function definition
     def __init__(self, header, funcdefhelp, stmt, stmtlist):
@@ -77,9 +78,6 @@ class FuncDef(Node): # function definition
 
     def __str__(self):
         return self.pprint()
-
-    def sem(self, symbol_table):
-        pass
 
 
 class FuncDecl(Node): # function definition
@@ -173,9 +171,10 @@ class FunctionHeader(Node):
                         'but the name is already in use.'
             raise Exception(errormsg)
 
-            new_entry = FunctionEntry(self.function_name, self.function_type, self.params)
-            symbol_table.insert(self.function_name, new_entry, defined=False)
-
+            new_entry = FunctionEntry(self.function_name,\
+                        self.function_type, self.params, defined=False\
+                        )
+            symbol_table.insert(self.function_name, new_entry)
             return True
 
         else:
@@ -193,12 +192,14 @@ class FunctionHeader(Node):
                 entry.defined = True
 
             else:
-                new_entry = FunctionEntry(self.function_name, self.function_type, self.params)
-                symbol_table.insert(self.function_name, new_entry, defined=True)
+                new_entry = FunctionEntry(self.function_name,\
+                            self.function_type, self.params, defined=True\
+                            )
+                symbol_table.insert(self.function_name, new_entry)
 
                 symbol_table.openScope()
 
-                for n,t,ref in params:
+                for n,t,ref in self.params:
                     symbol_table.insert(n, FunctionParam(n,t,ref))
 
             return True

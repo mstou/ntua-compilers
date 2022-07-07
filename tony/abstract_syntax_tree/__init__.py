@@ -5,3 +5,4 @@ from .expressions      import *
 from .functions        import *
 from .statements       import *
 from .var_definitions  import *
+from .symbol_table     import *

@@ -1,5 +1,6 @@
 import re
 from .node import Node, indentation
+from .data_types import *
 
 escape_newline = lambda x: re.sub('\n', lambda _: '\\n', str(x))
 

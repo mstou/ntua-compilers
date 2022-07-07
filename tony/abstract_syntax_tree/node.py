@@ -23,24 +23,25 @@ class Node:
 
 
 class Program(Node):
-    def __init__(self, symbol_table, funcdef):
-        self.symbol_table = symbol_table
+    def __init__(self, funcdef):
         self.main = funcdef
 
-    def sem(self):
+    def sem(self, symbol_table):
         '''
             1) Opens the global scope
             2) Checks that the program consists of one function with no parameters
             3) Calls the sem() of the function
         '''
-
+        self.symbol_table = symbol_table
         symbol_table.openScope()
 
         if self.main.header.params != []:
             errormsg = f'The program should consist of a function with no parameters'
             raise Exception(errormsg)
 
-        return self.main.sem(symbol_table)
+        self.main.sem(symbol_table)
+
+        return True
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'Program:\n'

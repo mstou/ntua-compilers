@@ -1,7 +1,6 @@
 import sys
 import ply.yacc as yacc
 from .abstract_syntax_tree import *
-from .symbol_table import *
 
 # Get the token map from the lexer.
 from .lexer import tokens
@@ -21,7 +20,7 @@ precedence = (
 
 def p_program(p):
     '''program : funcdef'''
-    p[0] = Program(SymbolTable(), p[1])
+    p[0] = Program(p[1])
 
 #======== Function definition ========
 def p_funcdef(p):
@@ -346,10 +345,3 @@ def p_error(p):
 
 # Build the parser
 parser = yacc.yacc()
-
-# file = sys.argv[1]
-# print(file)
-#
-# with open(file, 'r', encoding='unicode_escape') as f:
-#     s = f.read()
-#     print(parser.parse(s, debug=0))

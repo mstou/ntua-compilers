@@ -64,7 +64,14 @@ class SymbolTable:
                 ('geti', BaseType.Int, []),
                 ('getb', BaseType.Bool, []),
                 ('getc', BaseType.Char, []),
-                ('gets', BaseType.Void, [('n', BaseType.Int, False), ('s', Array(BaseType.Char), False)])
+                ('gets', BaseType.Void, [('n', BaseType.Int, False), ('s', Array(BaseType.Char), False)]),
+                ('abs', BaseType.Int, [('n', BaseType.Int, False)]),
+                ('ord', BaseType.Int, [('c', BaseType.Char, False)]),
+                ('chr', BaseType.Char, [('n', BaseType.Int, False)]),
+                ('strlen', BaseType.Int, [('s', Array(BaseType.Char), False)]),
+                ('strcmp', BaseType.Int, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
+                ('strcpy', BaseType.Void, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
+                ('strcat', BaseType.Void, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
             ]
 
             for f in builtin_funcs:

@@ -1,3 +1,5 @@
+from .abstract_syntax_tree import BaseType, Array
+
 class SymbolEntry:
     ''' Abstract class for entries of the Symbol Table '''
 
@@ -19,7 +21,7 @@ class FunctionParam(SymbolEntry):
         return f'Function parameter {self.name} of type'+\
                f'{"ref" if self.reference else ""} {self.type}'
 
-class Function(SymbolEntry):
+class FunctionEntry(SymbolEntry):
     def __init__(self, name, type, params, defined=False):
         # params is an array of tuples: (name, type, reference)
         self.func_name   = name
@@ -50,8 +52,24 @@ class Scope:
         return "\n".join([f'{k} -> {v}' for k, v in self.locals.items()])
 
 class SymbolTable:
-    def __init__(self):
+    def __init__(self, skip_builtins=False):
         self.scopes = []
+
+        if not skip_builtins:
+            builtin_funcs = [
+                ('puti', BaseType.Void, [('n', BaseType.Int, False)]),
+                ('putb', BaseType.Void, [('b', BaseType.Bool, False)]),
+                ('putc', BaseType.Void, [('c', BaseType.Char, False)]),
+                ('puts', BaseType.Void, [('s', Array(BaseType.Char), False)]),
+                ('geti', BaseType.Int, []),
+                ('getb', BaseType.Bool, []),
+                ('getc', BaseType.Char, []),
+                ('gets', BaseType.Void, [('n', BaseType.Int, False), ('s', Array(BaseType.Char), False)])
+            ]
+
+            for f in builtin_funcs:
+                self.insert(f[0], FunctionEntry(f[0],f[1],f[2]))
+
 
     def openScope(self):
         self.scopes.append(Scope())

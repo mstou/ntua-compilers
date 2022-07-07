@@ -173,7 +173,7 @@ class FunctionHeader(Node):
                         'but the name is already in use.'
             raise Exception(errormsg)
 
-            new_entry = Function(self.function_name, self.function_type, self.params)
+            new_entry = FunctionEntry(self.function_name, self.function_type, self.params)
             symbol_table.insert(self.function_name, new_entry, defined=False)
 
             return True
@@ -193,7 +193,7 @@ class FunctionHeader(Node):
                 entry.defined = True
 
             else:
-                new_entry = Function(self.function_name, self.function_type, self.params)
+                new_entry = FunctionEntry(self.function_name, self.function_type, self.params)
                 symbol_table.insert(self.function_name, new_entry, defined=True)
 
                 symbol_table.openScope()

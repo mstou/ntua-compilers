@@ -1,6 +1,8 @@
 from .node         import Node, indentation
 from .symbol_table import *
 from .data_types   import *
+from .atoms        import VarAtom
+from .expressions  import AtomArray
 
 class Statement(Node):
     ''' Generic class for statements '''
@@ -101,7 +103,7 @@ class ElseStatement(Statement):
             Calls the sem() of each statement
         '''
 
-        for s in statements:
+        for s in self.statements:
             s.sem(symbol_table)
 
         return True
@@ -312,7 +314,6 @@ class FunctionCall(Statement):
 
         # TODO 3
 
-        print('in here')
 
         f = symbol_table.lookup(self.name)
 
@@ -331,7 +332,7 @@ class FunctionCall(Statement):
             actual_type = e.sem(symbol_table)
 
             if expected_type != actual_type:
-                errormsg = f'Expected a parameter of type {expected_type}' +\
+                errormsg = f'Expected a parameter of type {expected_type} ' +\
                            f'but got {actual_type} instead'
                 raise Exception(errormsg)
 
@@ -368,7 +369,7 @@ class Assignment(Statement):
 
         expr_type = self.expr.sem(symbol_table)
 
-        if not isistance(self.atom, VarAtom.__class__):
+        if not isinstance(self.atom, VarAtom) and not isinstance(self.atom, AtomArray):
             errormsg = f'The left-hand side of an assignment can only be a variable.'
             raise Exception(errormsg)
 

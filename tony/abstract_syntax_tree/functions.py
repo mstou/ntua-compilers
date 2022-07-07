@@ -187,7 +187,7 @@ class FunctionHeader(Node):
             return True
 
         else:
-            if entry != None and not isinstance(entry, Function):
+            if entry != None and not isinstance(entry, FunctionEntry):
                 errormsg = f'Tried to define a function with name {self.name} ' +\
                             'but the name is already in use.'
                 raise Exception(errormsg)

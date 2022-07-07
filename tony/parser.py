@@ -55,9 +55,9 @@ def p_header(p):
     elif len(p) == 5:  # Rule 2
         p[0] = FunctionHeader(p[1], p[2], None, None)
     elif len(p) == 6:  # Rule 3
-        p[0] = FunctionHeader(BaseType.Void, p[1], p[3], p[4])
+        p[0] = FunctionHeader(VoidNode(), p[1], p[3], p[4])
     elif len(p) == 4:  # Rule 4
-        p[0] = FunctionHeader(BaseType.Void, p[1], None, None)
+        p[0] = FunctionHeader(VoidNode(), p[1], None, None)
 
 #=========== Formal ==============
 def p_formal(p):
@@ -80,23 +80,23 @@ def p_formallist(p):
 # ================ Type ================
 def p_type_simple_int(p):
     '''type : INT'''
-    p[0] = BaseType.Int
+    p[0] = IntValue(p[1])
 
 def p_type_simple_bool(p):
     '''type : BOOL'''
-    p[0] = BaseType.Bool
+    p[0] = BooleanValue(p[1])
 
 def p_type_simple_char(p):
     '''type : CHAR'''
-    p[0] = BaseType.Char
+    p[0] = CharValue(p[1])
 
 def p_type_array(p):
     '''type : type LBRACKET RBRACKET'''
-    p[0] = Array(p[1])
+    p[0] = ArrayNode(p[1])
 
 def p_type_list(p):
     '''type : LIST LBRACKET type RBRACKET'''
-    p[0] = List(p[3])
+    p[0] = ListNode(p[3])
 
 #=========== Func-decl ============
 def p_funcdecl(p):
@@ -307,7 +307,7 @@ def p_expression_new(p):
 
 def p_expression_nil(p):
     '''expression : NIL'''
-    p[0] = BaseType.Nil
+    p[0] = EmptyListNode()
 
 def p_expression_nil2(p):
     '''expression : NIL2 LPAREN expression RPAREN'''
@@ -315,7 +315,7 @@ def p_expression_nil2(p):
 
 def p_expression_hash(p):
     '''expression : expression HASH expression'''
-    p[0] = ListOperator(p[1], p[2])
+    p[0] = ListOperator(p[1], p[3])
 
 def p_expression_head(p):
     '''expression : HEAD LPAREN expression RPAREN'''

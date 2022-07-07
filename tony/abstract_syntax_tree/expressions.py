@@ -175,6 +175,59 @@ class BinaryBoolean(Expression):
     def __str__(self):
         return self.pprint()
 
+class ArrayNode(Expression):
+    def __init__(self, type):
+        self.type = type
+
+    def sem(self, symbol_table):
+        return Array(self.type.sem(symbol_table))
+
+    def pprint(self, indent=0):
+        return f'{indentation(indent)}{self.type}'
+
+    def __str__(self):
+        return self.pprint()
+
+
+class ListNode(Expression):
+    def __init__(self, type):
+        self.type = type
+
+    def sem(self, symbol_table):
+        return List(self.type.sem(symbol_table))
+
+    def pprint(self, indent=0):
+        return f'{indentation(indent)}{self.type}'
+
+    def __str__(self):
+        return self.pprint()
+
+class VoidNode(Expression):
+    def __init__(self):
+        pass
+
+    def sem(self, symbol_table):
+        return BaseType.Void
+
+    def pprint(self, indent=0):
+        return f'{indentation(indent)}{BaseType.Void}'
+
+    def __str__(self):
+        return self.pprint()
+
+class EmptyListNode(Expression):
+    def __init__(self):
+        pass
+
+    def sem(self, symbol_table):
+        return BaseType.Nil
+
+    def pprint(self, indent=0):
+        return f'{indentation(indent)}{BaseType.Void}'
+
+    def __str__(self):
+        return self.pprint()
+
 class IntValue(Expression):
     def __init__(self, data):
         self.data = data
@@ -303,7 +356,7 @@ class isEmptyList(Expression):
         '''
         expr_type = self.expr.sem(symbol_table)
 
-        if expr_type != BaseType.Nil and not isinstance(expr_type, List.__class__):
+        if expr_type != BaseType.Nil and not isinstance(expr_type, List):
             errormsg = f'nil? expects a list as a parameter but a {expr_type} was given.'
             raise Exception(errormsg)
 
@@ -328,7 +381,6 @@ class ListOperator(Expression):
 
             2) Returns the type of the list
         '''
-
         head_type = self.head.sem(symbol_table)
         tail_type = self.tail.sem(symbol_table)
 
@@ -361,7 +413,7 @@ class TailOperator(Expression):
 
         t = self.expr.sem(symbol_table)
 
-        if not isistance(t, List.__class__):
+        if not isinstance(t, List):
             errormsg = f'Tail operator can not be used with type {t}.'
             raise Exception(errormsg)
 
@@ -387,7 +439,7 @@ class HeadOperator(Expression):
 
         t = self.expr.sem(symbol_table)
 
-        if not isistance(t, List.__class__):
+        if not isinstance(t, List):
             errormsg = f'Head operator can not be used with type {t}.'
             raise Exception(errormsg)
 

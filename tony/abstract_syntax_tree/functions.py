@@ -23,6 +23,30 @@ class FuncDef(Node): # function definition
 
         self.statements = [self.stmt] + self.stmtlist.getStatements()
 
+    def sem(self, symbol_table):
+        '''
+            1) Calls the sem() function of the header declaring that it is
+            a function definition
+            2) Calls the sem of the rest of the components
+        '''
+
+        self.header.sem(symbol_table, decl=False)
+
+        for v in self.vardefs:
+            v.sem(symbol_table)
+
+        for decl in self.funcdecls:
+            decl.sem(symbol_table)
+
+        for f_def in self.funcdefs:
+            f_def.sem(symbol_table)
+
+        for stmt in self.statements:
+            stmt.sem(symbol_table)
+
+        return True
+
+
     def pprint(self, indent=0):
         s  = indentation(indent)
         s += 'Function Definition\n'
@@ -63,8 +87,8 @@ class FuncDecl(Node): # function definition
         self.header = header
 
     def sem(self, symbol_table):
-        return self.header.sem(symbol_table)
-    
+        return self.header.sem(symbol_table,decl = True)
+
     def pprint(self, indent=0):
         s = indentation(indent)
         s += f'Function Declaration:\n'

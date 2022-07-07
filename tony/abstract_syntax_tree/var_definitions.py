@@ -1,4 +1,5 @@
-from .node import Node, indentation
+from .node         import Node, indentation
+from .symbol_table import Variable
 
 class VariableDefinition(Node):
     def __init__(self, type, names):
@@ -12,14 +13,16 @@ class VariableDefinition(Node):
 
             2) Inserts the variable to the current scope
         '''
+        type = self.type.sem(symbol_table)
+
         for name in self.names:
             if symbol_table.lookup_current_scope(name) != None:
                 errormsg = f'Syntax Error. Variable {name} is already defined.'
                 raise Exception(errormsg)
 
-            symbol_table.insert(name, self.type)
+            symbol_table.insert(name, Variable(name,type))
 
-        return self.type
+        return type
 
     def pprint(self, indent=0):
         return indentation(indent) + f'{self.type} ' +\

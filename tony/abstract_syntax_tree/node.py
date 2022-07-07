@@ -6,11 +6,11 @@ class Node:
 
     def sem(self, symbol_table):
         '''
-        Semantic Analysis
+            Semantic Analysis
 
-        1) Checks that all children are semantically correct
-        2) Makes the necessary changes to the symbol table
-        3) Returns its type
+            1) Checks that all children are semantically correct
+            2) Makes the necessary changes to the symbol table
+            3) Returns its type
         '''
         pass
 
@@ -29,13 +29,17 @@ class Program(Node):
 
     def sem(self):
         '''
-        1) Recursively checks that the semantics of
-        the function definition are correct
-
-        2) TODO: Checks that this function is called main
+            1) Opens the global scope
+            2) Checks that the program consists of one function with no parameters
+            3) Calls the sem() of the function
         '''
 
         symbol_table.openScope()
+
+        if self.main.header.params != []:
+            errormsg = f'The program should consist of a function with no parameters'
+            raise Exception(errormsg)
+
         return self.main.sem(symbol_table)
 
     def pprint(self, indent=0):

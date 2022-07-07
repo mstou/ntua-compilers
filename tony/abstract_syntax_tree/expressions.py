@@ -281,6 +281,26 @@ class AtomArray(Expression):
         self.atom = atom
         self.expr = expr
 
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the name exists and is indeed an array
+            2) Checks that the expr has type Int
+            3) Returns the type of the expr
+        '''
+        atom_type = self.atom.sem(symbol_table)
+
+        if not isinstance(atom_type, Array):
+            errormsg = f'Type {atom_type} is not subscriptable'
+            raise Exception(errormsg)
+
+        expr_type = self.expr.sem(symbol_table)
+
+        if expr_type != BaseType.Int:
+            errormsg = 'Indices of arrays can only be of type int'
+            raise Exception(errormsg)
+
+        return atom_type.t
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.atom}[ . ]\n'+\
                self.expr.pprint(indent=indent+2)
@@ -337,6 +357,19 @@ class NewArray(Expression):
     def __init__(self, type, expr):
         self.type = type
         self.expr = expr
+
+    def sem(self, symbol_table):
+        '''
+            1) Checks that the expr is of type BaseType.Int
+            2) Returns the type of the new array
+        '''
+        expr_type = self.expr.sem(symbol_table)
+
+        if expr_type != BaseType.Int:
+            errormsg = f'The length of an array can only be of type {BaseType.Int}'
+            raise Exception(errormsg)
+
+        return Array(self.type.sem(symbol_table))
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}new array {self.type} of length\n'+\

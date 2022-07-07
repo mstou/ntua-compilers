@@ -31,7 +31,7 @@ class List(CompositeType):
         self.t = t # subtype
 
     def __eq__(self, other):
-        if isinstance(other, BaseType.__class__):
+        if isinstance(other, BaseType):
             return other == BaseType.Nil
 
         if isinstance(other, self.__class__):

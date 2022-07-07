@@ -45,6 +45,8 @@ class FuncDef(Node): # function definition
         for stmt in self.statements:
             stmt.sem(symbol_table)
 
+        symbol_table.closeScope()
+
         return True
 
 
@@ -162,8 +164,15 @@ class FunctionHeader(Node):
             if name in param_names:
                 errormsg = f'Two or more parameters share the name {name}'
                 raise Exception(errormsg)
-            param_names.insert(name)
+            param_names.add(name)
 
+        parameters = []
+        for p in self.params:
+            name, t, ref = p
+            type = t.sem(symbol_table) # calculate the actual type
+            parameters.append((name,type,ref))
+
+        return_type = self.function_type.sem(symbol_table)
 
         entry = symbol_table.lookup(self.function_name)
         if decl:
@@ -172,13 +181,13 @@ class FunctionHeader(Node):
             raise Exception(errormsg)
 
             new_entry = FunctionEntry(self.function_name,\
-                        self.function_type, self.params, defined=False\
+                        return_type, parameters, defined=False\
                         )
             symbol_table.insert(self.function_name, new_entry)
             return True
 
         else:
-            if entry != None and not isinstance(entry, Function.__class__):
+            if entry != None and not isinstance(entry, Function):
                 errormsg = f'Tried to define a function with name {self.name} ' +\
                             'but the name is already in use.'
                 raise Exception(errormsg)
@@ -193,14 +202,15 @@ class FunctionHeader(Node):
 
             else:
                 new_entry = FunctionEntry(self.function_name,\
-                            self.function_type, self.params, defined=True\
+                            return_type, parameters, defined=True\
                             )
                 symbol_table.insert(self.function_name, new_entry)
 
                 symbol_table.openScope()
 
                 for n,t,ref in self.params:
-                    symbol_table.insert(n, FunctionParam(n,t,ref))
+                    type = t.sem(symbol_table)
+                    symbol_table.insert(n, FunctionParam(n,type,ref))
 
             return True
 

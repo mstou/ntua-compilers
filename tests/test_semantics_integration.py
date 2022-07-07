@@ -49,3 +49,17 @@ def test_string_reverse_semantics():
 
     s = SymbolTable()
     root = parser.parse(input).sem(s)
+
+@pytest.mark.semantics
+def test_lval_fun_semantics():
+    input = readFile('lval_fun.tony')
+
+    s = SymbolTable()
+    root = parser.parse(input).sem(s)
+
+@pytest.mark.semantics
+def test_var_shadowing_extreme_semantics():
+    input = readFile('var_shadowing_extreme.tony')
+
+    s = SymbolTable()
+    root = parser.parse(input).sem(s)

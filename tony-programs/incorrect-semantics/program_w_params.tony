@@ -1,0 +1,3 @@
+def main(int i):
+  i := 73
+end

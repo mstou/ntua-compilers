@@ -1,12 +1,35 @@
 import pytest
 from context import *
 
-CORRECT_PREFIX = 'tony-programs/'
+PROGRAMS_PREFIX = 'tony-programs/'
+SEMANTICS_TESTS = PROGRAMS_PREFIX + 'incorrect-semantics/'
 
-def readFile(file, prefix = CORRECT_PREFIX):
+def readFile(file, prefix = PROGRAMS_PREFIX):
     with open(prefix + file, 'r', encoding = 'unicode_escape') as f:
         s = f.read()
     return s
+
+@pytest.mark.semantics
+def test_incorrect_program_w_params():
+    input = readFile('program_w_params.tony', prefix = SEMANTICS_TESTS)
+    s = SymbolTable()
+    root = parser.parse(input)
+
+    assert root != None
+
+    with pytest.raises(Exception):
+        root.sem(s)
+
+@pytest.mark.semantics
+def test_incorrect_program_w_return_type():
+    input = readFile('program_w_return_type.tony', prefix = SEMANTICS_TESTS)
+    s = SymbolTable()
+    root = parser.parse(input)
+
+    assert root != None
+
+    with pytest.raises(Exception):
+        root.sem(s)
 
 @pytest.mark.semantics
 def test_helloworld_semantics():

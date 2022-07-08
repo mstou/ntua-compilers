@@ -1,3 +1,5 @@
+from .data_types import BaseType
+
 class Node:
     def __init__(self, type, value, children=None):
         self.type = type
@@ -30,7 +32,8 @@ class Program(Node):
         '''
             1) Opens the global scope
             2) Checks that the program consists of one function with no parameters
-            3) Calls the sem() of the function
+            3) Checks that the program consists of a void function
+            4) Calls the sem() of the function
         '''
         self.symbol_table = symbol_table
         symbol_table.openScope()
@@ -40,6 +43,13 @@ class Program(Node):
             raise Exception(errormsg)
 
         self.main.sem(symbol_table)
+
+        entry = symbol_table.lookup(self.main.header.function_name)
+
+        if entry.return_type != BaseType.Void:
+            errormsg = f'The program should consist of a function with no return type'
+            raise Exception(errormsg)
+
 
         return True
 

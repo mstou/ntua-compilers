@@ -1,4 +1,5 @@
 from .data_types import BaseType
+from llvmlite import ir, binding
 
 class Node:
     def __init__(self, type, value, children=None):
@@ -16,6 +17,15 @@ class Node:
         '''
         pass
 
+    def codegen(self, module, builder):
+        '''
+            LLVM Code generation
+
+            Adds the necessary instructions to the IR Builder
+            and returns an LLVM Value (where applicable)
+        '''
+        pass
+
     def pprint(self, indent=0):
         return indentation(indent) +\
                f'Instance of {self.__class__.__name__}'
@@ -27,6 +37,24 @@ class Node:
 class Program(Node):
     def __init__(self, funcdef):
         self.main = funcdef
+        self.symbol_table = None # will be initialized when sem is called
+        self.module  = None
+        self.binding = None
+        self.builder = None
+
+    def codegen_init():
+        ''' Initializes  llvm '''
+        self.binding = binding
+        self.binding.initialize()
+        self.binding.initialize_native_target()
+        self.binding.initialize_native_asmprinter()
+
+        # Declare builder
+        self.builder = ir.IRBuilder(block)
+
+    def codegen(self):
+        self.codegen_init()
+        pass
 
     def sem(self, symbol_table):
         '''

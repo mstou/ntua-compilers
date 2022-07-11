@@ -1,5 +1,7 @@
 from .node import Node, indentation
 from .data_types import *
+from llvmlite import ir
+from .llvm_types import LLVM_Types
 
 class Expression(Node):
     ''' Generic class for expressions '''
@@ -23,6 +25,9 @@ class ParenthesisExpr(Expression):
 
     def sem(self, symbol_table):
         return self.expr.sem(symbol_table)
+
+    def codegen(self, module, builder):
+        return self.expr.codegen(module, builder)
 
     def pprint(self, indent = 0):
         return indentation(indent) + 'Parenthesis\n' +\
@@ -61,6 +66,23 @@ class BinaryOperator(Expression):
             raise Exception(errormsg)
 
         return BaseType.Int
+
+    def codegen(self, module, builder):
+        lhs = self.left.codegen(module, builder)
+        rhs = self.right.codegen(module, builder)
+
+        if self.op == '+':
+            return builder.add(lhs, rhs, name='addtmp')
+        elif self.op == '-':
+            return builder.sub(lhs, rhs, name='subtmp')
+        elif self.op == '*':
+            return builder.mul(lhs, rhs, name='multmp')
+        elif self.op == '/':
+            return builder.sdiv(lhs, rhs, name='divtmp')
+        elif self.op == '%':
+            return builder.srem(lhs, rhs, name='divtmp')
+        else:
+            return None
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\
@@ -107,6 +129,20 @@ class BinaryComparison(Expression):
 
         return BaseType.Bool
 
+    def codegen(self, module, builder):
+        lhs = self.left.codegen(module, builder)
+        rhs = self.right.codegen(module, builder)
+
+        character_map = {
+        '=': '==', '<>': '!=',
+        '<': '<', '>': '>', '<=': '<=', '>=': '>='
+        }
+
+        if self.op in character_map:
+            builder.icmp_unsigned(character_map[self.op], lhs, rhs, name=f'comparisontmp{self.op}')
+        else:
+            return None
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\
                self.left.pprint(indent+2)+'\n'+\
@@ -128,6 +164,10 @@ class Not(Expression):
             raise Exception(error_msg)
 
         return BaseType.Bool
+
+    def codegen(self, module, builder):
+        expr = self.expr.codegen(module, builder)
+        return builder.not_(expr, name = 'nottmp')
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}not\n'+\
@@ -166,6 +206,17 @@ class BinaryBoolean(Expression):
             raise Exception(errormsg)
 
         return BaseType.Bool
+
+    def codegen(self, module, builder):
+        lhs = self.left.codegen(module, builder)
+        rhs = self.right.codegen(module, builder)
+
+        if self.op == 'and':
+            return builder.and_(lhs, rhs, name = 'andtmp')
+        elif self.op == 'or':
+            return builder.or_(lhs, rhs, name = 'ortmp')
+        else:
+            return None
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\
@@ -232,11 +283,11 @@ class IntValue(Expression):
     def __init__(self, data):
         self.data = data
 
-    def eval(self):
-        return self.data
-
     def sem(self, symbol_table):
         return BaseType.Int
+
+    def codegen(self, module, builder):
+        return ir.Constant(LLVM_Types.Int, self.data)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'
@@ -248,11 +299,11 @@ class BooleanValue(Expression):
     def __init__(self, data):
         self.data = data
 
-    def eval(self):
-        return self.data
-
     def sem(self, symbol_table):
         return BaseType.Bool
+
+    def codegen(self, module, builder):
+        return ir.Constant(LLVM_Types.Bool, 1 if self.data else 0)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'
@@ -264,11 +315,12 @@ class CharValue(Expression):
     def __init__(self, data):
         self.data = data
 
-    def eval(self):
-        return self.data
-
     def sem(self, symbol_table):
         return BaseType.Char
+
+    def codegen(self, module, builder):
+        return ir.Constant(LLVM_Types.Char, ord(self.data))
+        # TODO: do we have to fix escaped characters?
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'
@@ -323,6 +375,9 @@ class UniArithmeticPLUS(Expression):
 
         return t
 
+    def codegen(self, module, builder):
+        return self.expr.codegen(module, builder)
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}unary (+)\n' +\
                self.expr.pprint(indent=indent+2)
@@ -344,6 +399,10 @@ class UniArithmeticMINUS(Expression):
             raise Exception(error_msg)
 
         return t
+
+    def codegen(self, module, builder):
+        expr = self.expr.codegen(module, builder)
+        return builder.neg(expr, 'unaryminustmp')
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}unary (-)\n' +\
@@ -498,6 +557,14 @@ class CommaExpr(Expression):
         ''' This is not implemented and will never be called.
             The CommaExpr is only used for Function Calls where
             we will call the sem() function of each expression
+            separately.
+        '''
+        pass
+
+    def codegen(self, module, builder):
+        ''' This is not implemented and will never be called.
+            The CommaExpr is only used for Function Calls where
+            we will call the codegen() function of each expression
             separately.
         '''
         pass

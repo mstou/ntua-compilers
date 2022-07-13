@@ -10,6 +10,51 @@ def readFile(file, prefix = PROGRAMS_PREFIX):
     return s
 
 @pytest.mark.semantics
+def test_array_invalid_index():
+    input = readFile('array_invalid_index.tony', prefix = SEMANTICS_TESTS)
+    s = SymbolTable()
+    root = parser.parse(input)
+
+    assert root != None
+
+    with pytest.raises(Exception):
+        root.sem(s)
+
+@pytest.mark.semantics
+def test_array_invalid_value():
+    input = readFile('array_invalid_value.tony', prefix = SEMANTICS_TESTS)
+    s = SymbolTable()
+    root = parser.parse(input)
+
+    assert root != None
+
+    with pytest.raises(Exception):
+        root.sem(s)
+
+@pytest.mark.semantics
+def test_list_incorrect_initialization():
+    input = readFile('list_incorrect_initialization.tony', prefix = SEMANTICS_TESTS)
+    s = SymbolTable()
+    root = parser.parse(input)
+
+    assert root != None
+
+    with pytest.raises(Exception):
+        root.sem(s)
+        
+@pytest.mark.semantics
+def test_list_multiple_types():
+    input = readFile('list_multiple_types.tony', prefix = SEMANTICS_TESTS)
+    s = SymbolTable()
+    root = parser.parse(input)
+
+    assert root != None
+
+    with pytest.raises(Exception):
+        root.sem(s)
+
+
+@pytest.mark.semantics
 def test_incorrect_program_w_params():
     input = readFile('program_w_params.tony', prefix = SEMANTICS_TESTS)
     s = SymbolTable()

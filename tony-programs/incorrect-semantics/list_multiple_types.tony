@@ -1,0 +1,3 @@
+def main():
+    t := 42 # true $ nil
+end

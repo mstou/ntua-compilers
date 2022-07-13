@@ -1,0 +1,4 @@
+def main():
+    t := new int[42]
+    t[true] := 17
+end

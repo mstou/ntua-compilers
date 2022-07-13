@@ -218,6 +218,8 @@ class BinaryBoolean(Expression):
         else:
             return None
 
+        #TODO: implement short circuit evaluation
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.op}\n' +\
                self.left.pprint(indent+2)+'\n'+\

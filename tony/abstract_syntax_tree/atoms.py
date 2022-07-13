@@ -23,6 +23,13 @@ class VarAtom(Atom):
 
         raise Exception(f'Undefined variable {self.name}.')
 
+    def codegen(self, module, builder, symbol_table):
+        '''
+            We know that the atom exists from the semantic analysis.
+            We look it up in the symbol table and return its llvm value
+        '''
+        return symbol_table.lookup(self.name).cvalue
+        
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.name}'
 

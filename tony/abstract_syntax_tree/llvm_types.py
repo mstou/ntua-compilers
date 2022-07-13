@@ -1,5 +1,17 @@
 from llvmlite import ir
 
+def BaseType_to_LLVM(type):
+    if type == BaseType.Int:
+        return LLVM_Types.Int
+    if type == BaseType.Bool:
+        return LLVM_Type.Bool
+    if type == BaseType.Char:
+        return LLVM_Type.Char
+    if type == BaseType.Void:
+        return LLVM_Type.Void
+
+    return None
+
 class LLVM_Sizes():
     ''' Bit size of types '''
     Int  = 32 # 4 bytes

@@ -41,7 +41,7 @@ def test_list_incorrect_initialization():
 
     with pytest.raises(Exception):
         root.sem(s)
-        
+
 @pytest.mark.semantics
 def test_list_multiple_types():
     input = readFile('list_multiple_types.tony', prefix = SEMANTICS_TESTS)

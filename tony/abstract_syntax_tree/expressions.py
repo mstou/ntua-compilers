@@ -478,7 +478,7 @@ class ListOperator(Expression):
         head_type = self.head.sem(symbol_table)
         tail_type = self.tail.sem(symbol_table)
 
-        if tail_type != BaseType.Nil and tail_type != List(head_type):
+        if tail_type != BaseType.Nil or tail_type != List(head_type):
             errormsg = f'Incompatible types of head and tail. Expected' +\
                        f'{List(head_type)} but got {tail_type} instead.'
 

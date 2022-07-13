@@ -1,4 +1,4 @@
 def main():
-    list[int] l;
+    list[int] l
     l := 1 # 2 # 3
 end

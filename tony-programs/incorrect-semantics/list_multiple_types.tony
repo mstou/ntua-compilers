@@ -1,4 +1,4 @@
 def main():
     list[int] l
-    l := 42 # true $ nil
+    l := 42 # true # nil
 end

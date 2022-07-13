@@ -4,28 +4,31 @@ class SymbolEntry:
     ''' Abstract class for entries of the Symbol Table '''
 
 class Variable(SymbolEntry):
-    def __init__(self, name, type):
+    def __init__(self, name, type, cvalue=None):
         self.type  = type
         self.name  = name
+        self.cvalue = cvalue
 
     def __str__(self):
         return f'Variable {self.name} of type {self.type}'
 
 class FunctionParam(SymbolEntry):
-    def __init__(self, name, type, reference=False):
+    def __init__(self, name, type, reference=False, cvalue=None):
         self.type = type
         self.name = name
         self.reference = reference
+        self.cvalue = cvalue
 
     def __str__(self):
         return f'Function parameter {self.name} of type'+\
                f'{"ref" if self.reference else ""} {self.type}'
 
 class FunctionEntry(SymbolEntry):
-    def __init__(self, name, type, params, defined=False):
+    def __init__(self, name, type, params, defined=False, cvalue=None):
         # params is an array of tuples: (name, type, reference)
         self.func_name   = name
         self.return_type = type
+        self.cavlue      = cvalue
         self.params      = params
         self.defined     = defined # to distinguish functions that are declared
                                    # but not yet defined

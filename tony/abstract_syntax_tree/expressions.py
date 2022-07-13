@@ -26,8 +26,8 @@ class ParenthesisExpr(Expression):
     def sem(self, symbol_table):
         return self.expr.sem(symbol_table)
 
-    def codegen(self, module, builder):
-        return self.expr.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        return self.expr.codegen(module, builder, symbol_table)
 
     def pprint(self, indent = 0):
         return indentation(indent) + 'Parenthesis\n' +\
@@ -67,9 +67,9 @@ class BinaryOperator(Expression):
 
         return BaseType.Int
 
-    def codegen(self, module, builder):
-        lhs = self.left.codegen(module, builder)
-        rhs = self.right.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        lhs = self.left.codegen(module, builder, symbol_table)
+        rhs = self.right.codegen(module, builder, symbol_table)
 
         if self.op == '+':
             return builder.add(lhs, rhs, name='addtmp')
@@ -129,9 +129,9 @@ class BinaryComparison(Expression):
 
         return BaseType.Bool
 
-    def codegen(self, module, builder):
-        lhs = self.left.codegen(module, builder)
-        rhs = self.right.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        lhs = self.left.codegen(module, builder, symbol_table)
+        rhs = self.right.codegen(module, builder, symbol_table)
 
         character_map = {
         '=': '==', '<>': '!=',
@@ -165,8 +165,8 @@ class Not(Expression):
 
         return BaseType.Bool
 
-    def codegen(self, module, builder):
-        expr = self.expr.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        expr = self.expr.codegen(module, builder, symbol_table)
         return builder.not_(expr, name = 'nottmp')
 
     def pprint(self, indent=0):
@@ -207,9 +207,9 @@ class BinaryBoolean(Expression):
 
         return BaseType.Bool
 
-    def codegen(self, module, builder):
-        lhs = self.left.codegen(module, builder)
-        rhs = self.right.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        lhs = self.left.codegen(module, builder, symbol_table)
+        rhs = self.right.codegen(module, builder, symbol_table)
 
         if self.op == 'and':
             return builder.and_(lhs, rhs, name = 'andtmp')
@@ -286,7 +286,7 @@ class IntValue(Expression):
     def sem(self, symbol_table):
         return BaseType.Int
 
-    def codegen(self, module, builder):
+    def codegen(self, module, builder, symbol_table):
         return ir.Constant(LLVM_Types.Int, self.data)
 
     def pprint(self, indent=0):
@@ -302,7 +302,7 @@ class BooleanValue(Expression):
     def sem(self, symbol_table):
         return BaseType.Bool
 
-    def codegen(self, module, builder):
+    def codegen(self, module, builder, symbol_table):
         return ir.Constant(LLVM_Types.Bool, 1 if self.data else 0)
 
     def pprint(self, indent=0):
@@ -318,7 +318,7 @@ class CharValue(Expression):
     def sem(self, symbol_table):
         return BaseType.Char
 
-    def codegen(self, module, builder):
+    def codegen(self, module, builder, symbol_table):
         return ir.Constant(LLVM_Types.Char, ord(self.data))
         # TODO: do we have to fix escaped characters?
 
@@ -375,8 +375,8 @@ class UniArithmeticPLUS(Expression):
 
         return t
 
-    def codegen(self, module, builder):
-        return self.expr.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        return self.expr.codegen(module, builder, symbol_table)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}unary (+)\n' +\
@@ -400,8 +400,8 @@ class UniArithmeticMINUS(Expression):
 
         return t
 
-    def codegen(self, module, builder):
-        expr = self.expr.codegen(module, builder)
+    def codegen(self, module, builder, symbol_table):
+        expr = self.expr.codegen(module, builder, symbol_table)
         return builder.neg(expr, 'unaryminustmp')
 
     def pprint(self, indent=0):
@@ -561,7 +561,7 @@ class CommaExpr(Expression):
         '''
         pass
 
-    def codegen(self, module, builder):
+    def codegen(self, module, builder, symbol_table):
         ''' This is not implemented and will never be called.
             The CommaExpr is only used for Function Calls where
             we will call the codegen() function of each expression

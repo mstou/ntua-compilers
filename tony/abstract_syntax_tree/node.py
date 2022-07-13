@@ -1,4 +1,5 @@
 from .data_types import BaseType
+from .symbol_table import SymbolTable
 from llvmlite import ir, binding
 
 class Node:
@@ -17,7 +18,7 @@ class Node:
         '''
         pass
 
-    def codegen(self, module, builder):
+    def codegen(self, module, builder, symbol_table):
         '''
             LLVM Code generation
 
@@ -41,6 +42,7 @@ class Program(Node):
         self.module  = None
         self.binding = None
         self.builder = None
+        self.c_symbol_table = SymbolTable()
 
     def codegen_init():
         ''' Initializes  llvm '''

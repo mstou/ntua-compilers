@@ -57,6 +57,7 @@ class Scope:
 class SymbolTable:
     def __init__(self, skip_builtins=False):
         self.scopes = []
+        self.id = 0
 
         if not skip_builtins:
             builtin_funcs = [
@@ -112,6 +113,10 @@ class SymbolTable:
 
         s += '----------------------\n'
         return s
+
+    def get_id(self):
+        self.id += 1
+        return self.id
 
 
 # st = SymbolTable()

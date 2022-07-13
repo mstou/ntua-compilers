@@ -31,10 +31,25 @@ class VarAtom(Atom):
 
 class StringAtom(Atom):
     def __init__(self, value):
-        self.value = value
+        self.value = value + '\0'
 
     def sem(self, symbol_table):
         return Array(BaseType.Char)
+
+    def codegen(self, module, builder, symbol_table):
+        '''
+            1) Registers a new global variable of type LLVM_Type.Char *
+            2) Allocates space and writes the given string
+            3) Returns the cvalue of the ptr
+        '''
+        length = len(self.value)
+        llvm_value = ir.Constant(ir.ArrayType(LLVM_Type.Char, length),
+                                 bytearray(self.value.encode("utf-8"))
+                                )
+        ptr = self.builder.alloca(llvm_value.type)
+        builder.store(llvm_value, ptr)
+
+        return ptr
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{escape_newline(self.value)}'

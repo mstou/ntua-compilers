@@ -1,14 +1,15 @@
 from llvmlite import ir
+from .data_types import BaseType
 
 def BaseType_to_LLVM(type):
     if type == BaseType.Int:
         return LLVM_Types.Int
     if type == BaseType.Bool:
-        return LLVM_Type.Bool
+        return LLVM_Types.Bool
     if type == BaseType.Char:
-        return LLVM_Type.Char
+        return LLVM_Types.Char
     if type == BaseType.Void:
-        return LLVM_Type.Void
+        return LLVM_Types.Void
 
     return None
 

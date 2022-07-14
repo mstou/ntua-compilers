@@ -1,6 +1,7 @@
 from .node         import Node, indentation
 from .symbol_table import *
 from .llvm_types   import BaseType_to_LLVM
+from llvmlite      import ir
 
 class FuncDef(Node): # function definition
     def __init__(self, header, funcdefhelp, stmt, stmtlist):
@@ -66,7 +67,7 @@ class FuncDef(Node): # function definition
 
         entry_block = func.append_basic_block(f'{self.header.function_name}_entry')
 
-        with builder.goto(entry_block):
+        with builder.goto_block(entry_block):
             for v in self.vardefs:
                 v.codegen(module, builder, symbol_table)
 
@@ -80,6 +81,8 @@ class FuncDef(Node): # function definition
                 stmt.codegen(module, builder, symbol_table)
                 #TODO: check the return statement and add ret_void for void functions
 
+            if self.header.return_type_llvm == BaseType_to_LLVM(BaseType.Void):
+                builder.ret_void()
             symbol_table.closeScope()
 
         return func
@@ -210,6 +213,7 @@ class FunctionHeader(Node):
             parameters.append((name,type,ref))
 
         return_type = self.function_type.sem(symbol_table)
+        self.return_type_llvm = BaseType_to_LLVM(return_type)
 
         entry = symbol_table.lookup(self.function_name)
         if decl:
@@ -275,17 +279,19 @@ class FunctionHeader(Node):
             # not previously declared.
             # declare the function type and add it to the scope
             parameters = [BaseType_to_LLVM(p[1]) for p in self.params]
-            ret_type   = BaseType_to_LLVM(self.function_type)
+            ret_type   = self.return_type_llvm
             func_type = ir.FunctionType(ret_type, parameters)
             func_cvalue = ir.Function(module, func_type, name=self.function_name)
 
-            symbol_table.insert(FunctionEntry(
-                self.function_name,
-                self.function_type,
-                self.params,
-                defined = not decl,
-                cvalue = func_cvalue
-            ))
+            symbol_table.insert(self.function_name,
+                FunctionEntry(
+                    self.function_name,
+                    self.function_type,
+                    self.params,
+                    defined = not decl,
+                    cvalue = func_cvalue
+                )
+            )
 
         if not decl:
             # begining the definition

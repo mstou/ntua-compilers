@@ -44,19 +44,30 @@ class Program(Node):
         self.builder = None
         self.c_symbol_table = SymbolTable()
 
-    def codegen_init():
+    def codegen_init(self):
         ''' Initializes  llvm '''
         self.binding = binding
         self.binding.initialize()
         self.binding.initialize_native_target()
         self.binding.initialize_native_asmprinter()
 
+        self.module = ir.Module()
+        self.module.triple = self.binding.get_default_triple()
+
         # Declare builder
-        self.builder = ir.IRBuilder(block)
+        self.builder = ir.IRBuilder()
 
     def codegen(self):
+        # pre-processing
         self.codegen_init()
-        pass
+
+        self.main.codegen(self.module, self.builder, self.c_symbol_table)
+
+        # post-processing
+        self.module = self.binding.parse_assembly(str(self.module))
+        self.module.verify()
+
+        return self.module
 
     def sem(self, symbol_table):
         '''

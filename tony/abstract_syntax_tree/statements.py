@@ -28,6 +28,12 @@ class SkipStatment(Statement):
     def sem(self, symbol_table):
         return True
 
+    def codegen(self, module, builder, symbol_table):
+        '''
+            The skip statement does nothing.
+        '''
+        return None
+
     def pprint(self, indent=0):
         return indentation(indent) + f'Skip()'
 
@@ -43,6 +49,10 @@ class ReturnStatement(Statement):
         return self.expr.sem(symbol_table)
         #TODO: check that we are inside a function that returns the type we return.
 
+    def codegen(self, module, builder, symbol_table):
+        expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+        return builder.ret(expr_cvalue)
+    
     def pprint(self, indent=0):
         return indentation(indent) + f'Return\n'+\
                self.expr.pprint(indent+2)

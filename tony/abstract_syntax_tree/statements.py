@@ -382,6 +382,14 @@ class Assignment(Statement):
 
         return True
 
+    def codegen(self, module, builder, symbol_table):
+        atom_cvalue = self.atom.codegen(module, builder, symbol_table) # performs a lookup and returns the cvalue
+        expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        builder.store(expr_cvalue, atom_cvalue)
+
+        return None
+
     def pprint(self, indent=0):
         s = indentation(indent) + 'Assignment\n'
         s += indentation(indent+2) + f'Name: {self.atom}\n'

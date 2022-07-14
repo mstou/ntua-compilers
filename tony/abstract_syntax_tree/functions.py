@@ -1,5 +1,6 @@
 from .node         import Node, indentation
 from .symbol_table import *
+from .llvm_types   import BaseType_to_LLVM
 
 class FuncDef(Node): # function definition
     def __init__(self, header, funcdefhelp, stmt, stmtlist):
@@ -50,6 +51,38 @@ class FuncDef(Node): # function definition
 
         return True
 
+    def codegen(self, module, builder, symbol_table):
+        '''
+            1) Calls the codegen() function of the header to register the function,
+            open a new scope in the symbol table and insert all the parameters.
+
+            2) Creates a new block which is the function's entry block
+
+            3) Changes the builder to write in the function's entry block and
+            calls the codegen() of all the statements
+        '''
+
+        func = self.header.codegen(module, builder, symbol_table)
+
+        entry_block = func.append_basic_block(f'{self.header.function_name}_entry')
+
+        with builder.goto(entry_block):
+            for v in self.vardefs:
+                v.codegen(module, builder, symbol_table)
+
+            for decl in self.funcdecls:
+                decl.codegen(module, builder, symbol_table)
+
+            for f_def in self.funcdefs:
+                f_def.codegen(module, builder, symbol_table)
+
+            for stmt in self.statements:
+                stmt.codegen(module, builder, symbol_table)
+                #TODO: check the return statement and add ret_void for void functions
+
+            symbol_table.closeScope()
+
+        return func
 
     def pprint(self, indent=0):
         s  = indentation(indent)
@@ -89,6 +122,9 @@ class FuncDecl(Node): # function definition
 
     def sem(self, symbol_table):
         return self.header.sem(symbol_table,decl = True)
+
+    def codegen(self, module, builder, symbol_table):
+        return self.header.codegen(module, builder, symbol_table)
 
     def pprint(self, indent=0):
         s = indentation(indent)
@@ -214,6 +250,58 @@ class FunctionHeader(Node):
                     symbol_table.insert(n, FunctionParam(n,type,ref))
 
             return True
+
+    def codegen(self, module, builder, symbol_table, decl = False):
+        '''
+            We may have arrived here either from a declaration or
+            from a function definition.
+
+            In the case of a function declaration:
+                We know that the function has not already been declared from the semantics check.
+                -> We add the function to the symbol table and label it undefined
+
+            In the case of a function definition:
+                We know that this is the only definition of the function from the semantics check.
+                -> We add the function to the symbol table if it has not already been declared
+                -> We add a function definition in the module
+                -> We open a new scope and insert all the parameters of the function
+        '''
+
+        if not decl:
+            func_cvalue = symbol_table.lookup(self.function_name)
+
+        if func_cvalue == None or decl:
+            # the function is about to be declared or about to be defined and was
+            # not previously declared.
+            # declare the function type and add it to the scope
+            parameters = [BaseType_to_LLVM(p[1]) for p in self.params]
+            ret_type   = BaseType_to_LLVM(self.function_type)
+            func_type = ir.FunctionType(ret_type, parameters)
+            func_cvalue = ir.Function(module, func_type, name=self.function_name)
+
+            symbol_table.insert(FunctionEntry(
+                self.function_name,
+                self.function_type,
+                self.params,
+                defined = not decl,
+                cvalue = func_cvalue
+            ))
+
+        if not decl:
+            # begining the definition
+
+            # we open a new scope in the symbol table
+            symbol_table.openScope()
+
+            # register all the arguments
+            for i, arg in enumerate(func_cvalue.args):
+                n, t, ref = self.params[i]
+                cvalue = arg
+                symbol_table.insert(n, FunctionParam(n,type,ref,cvalue=cvalue))
+                # TODO: t is not a BaseType, change all nodes to save their llvm type in a variable
+                # TODO: implement reference variables
+
+        return func_cvalue
 
     def pprint(self, indent=0):
         s = f'{indentation(indent)}Function Header\n'+\

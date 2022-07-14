@@ -28,7 +28,7 @@ class FunctionEntry(SymbolEntry):
         # params is an array of tuples: (name, type, reference)
         self.func_name   = name
         self.return_type = type
-        self.cavlue      = cvalue
+        self.cvalue      = cvalue
         self.params      = params
         self.defined     = defined # to distinguish functions that are declared
                                    # but not yet defined

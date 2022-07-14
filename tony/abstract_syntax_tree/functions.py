@@ -46,6 +46,7 @@ class FuncDef(Node): # function definition
             stmt.sem(symbol_table)
 
         symbol_table.closeScope()
+        #TODO: check that there are no functions that are declared and not implemented in the closed scope
 
         return True
 

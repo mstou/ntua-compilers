@@ -41,6 +41,7 @@ class ReturnStatement(Statement):
 
     def sem(self, symbol_table):
         return self.expr.sem(symbol_table)
+        #TODO: check that we are inside a function that returns the type we return.
 
     def pprint(self, indent=0):
         return indentation(indent) + f'Return\n'+\

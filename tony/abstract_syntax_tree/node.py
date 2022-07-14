@@ -80,6 +80,7 @@ class Program(Node):
             errormsg = f'The program should consist of a function with no return type'
             raise Exception(errormsg)
 
+        # TODO: check that all functions that were declared were also defined
 
         return True
 

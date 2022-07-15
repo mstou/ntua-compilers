@@ -1,5 +1,5 @@
 from llvmlite import ir
-from .data_types import BaseType
+from .data_types import BaseType, Array
 
 def BaseType_to_LLVM(type):
     if type == BaseType.Int:
@@ -10,6 +10,9 @@ def BaseType_to_LLVM(type):
         return LLVM_Types.Char
     if type == BaseType.Void:
         return LLVM_Types.Void
+
+    if isinstance(type, Array):
+        return BaseType_to_LLVM(type.t).as_pointer()
 
     return None
 

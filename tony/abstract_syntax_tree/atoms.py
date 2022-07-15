@@ -1,6 +1,9 @@
-import re
-from .node import Node, indentation
+from .node       import Node, indentation
 from .data_types import *
+from .llvm_types import LLVM_Types
+
+import re
+from llvmlite import ir
 
 escape_newline = lambda x: re.sub('\n', lambda _: '\\n', str(x))
 
@@ -29,7 +32,7 @@ class VarAtom(Atom):
             We look it up in the symbol table and return its llvm value
         '''
         return symbol_table.lookup(self.name).cvalue
-        
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.name}'
 
@@ -38,7 +41,7 @@ class VarAtom(Atom):
 
 class StringAtom(Atom):
     def __init__(self, value):
-        self.value = value + '\0'
+        self.value = value[1:-1] + '\0' # get rid of the "" and add terminating character
 
     def sem(self, symbol_table):
         return Array(BaseType.Char)
@@ -49,14 +52,15 @@ class StringAtom(Atom):
             2) Allocates space and writes the given string
             3) Returns the cvalue of the ptr
         '''
-        length = len(self.value)
-        llvm_value = ir.Constant(ir.ArrayType(LLVM_Type.Char, length),
-                                 bytearray(self.value.encode("utf-8"))
-                                )
-        ptr = self.builder.alloca(llvm_value.type)
-        builder.store(llvm_value, ptr)
-
-        return ptr
+        length   = len(self.value)
+        str_type = ir.ArrayType(LLVM_Types.Char, length)
+        llvm_value = ir.GlobalVariable(module, str_type,
+                                       f'str_literal_{symbol_table.get_id()}'
+                                       )
+        llvm_value.initializer = ir.Constant(str_type, bytearray(self.value.encode("utf-8")))
+        char_ptr = LLVM_Types.Char.as_pointer()
+        str_ptr  = builder.bitcast(llvm_value, char_ptr)
+        return str_ptr
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{escape_newline(self.value)}'

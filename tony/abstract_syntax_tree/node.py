@@ -54,14 +54,13 @@ class Program(Node):
         self.module = ir.Module()
         self.module.triple = self.binding.get_default_triple()
 
-        # Declare builder
-        self.builder = ir.IRBuilder()
+        self.builder = None # the builder will be declared inside the function definition
 
     def codegen(self):
         # pre-processing
         self.codegen_init()
 
-        self.main.codegen(self.module, self.builder, self.c_symbol_table)
+        self.main.codegen(self.module, self.builder, self.c_symbol_table, main=True)
 
         # post-processing
         self.module = self.binding.parse_assembly(str(self.module))

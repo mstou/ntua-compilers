@@ -52,7 +52,7 @@ class FuncDef(Node): # function definition
 
         return True
 
-    def codegen(self, module, builder, symbol_table):
+    def codegen(self, module, builder, symbol_table, main=False):
         '''
             1) Calls the codegen() function of the header to register the function,
             open a new scope in the symbol table and insert all the parameters.
@@ -66,6 +66,9 @@ class FuncDef(Node): # function definition
         func = self.header.codegen(module, builder, symbol_table)
 
         entry_block = func.append_basic_block(f'{self.header.function_name}_entry')
+
+        if main:
+            builder = ir.IRBuilder(entry_block)
 
         with builder.goto_block(entry_block):
             for v in self.vardefs:

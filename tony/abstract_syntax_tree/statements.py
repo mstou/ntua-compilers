@@ -52,7 +52,7 @@ class ReturnStatement(Statement):
     def codegen(self, module, builder, symbol_table):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
         return builder.ret(expr_cvalue)
-    
+
     def pprint(self, indent=0):
         return indentation(indent) + f'Return\n'+\
                self.expr.pprint(indent+2)
@@ -349,7 +349,14 @@ class FunctionCall(Statement):
 
         return f.return_type
 
+    def codegen(self, module, builder, symbol_table):
+        func_cvalue = symbol_table.lookup(self.name).cvalue
+        params = []
 
+        for e in self.expressions:
+            params.append(e.codegen(module, builder, symbol_table))
+
+        return builder.call(func_cvalue, params)
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'Function Call\n'

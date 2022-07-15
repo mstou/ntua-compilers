@@ -7,6 +7,7 @@ class VariableDefinition(Node):
     def __init__(self, type, names):
         self.type = type
         self.names = names
+        self.llvm_type = None
 
     def sem(self, symbol_table):
         '''
@@ -15,6 +16,7 @@ class VariableDefinition(Node):
             2) Inserts the variable to the current scope
         '''
         type = self.type.sem(symbol_table)
+        self.llvm_type = BaseType_to_LLVM(type)
 
         for name in self.names:
             if symbol_table.lookup_current_scope(name) != None:
@@ -30,12 +32,13 @@ class VariableDefinition(Node):
             We know from sem() that the name does not exist.
             We add the variable in the symbol table along with its LLVM value
         '''
-        t = BaseType_to_LLVM(self.type)
+        t = self.llvm_type
+
         cvalues = []
-        for names in self.names:
+        for name in self.names:
             cvalue = ir.GlobalVariable(module, t, f'{name}_{symbol_table.get_id()}')
             cvalues.append(cvalue)
-            symbol_table.insert(Variable(name, self.type, cvalue))
+            symbol_table.insert(name, Variable(name, t, cvalue))
 
         return cvalues
 

@@ -1,5 +1,7 @@
-from .data_types import BaseType
-from .symbol_table import SymbolTable
+from .data_types   import BaseType
+from .symbol_table import SymbolTable, FunctionEntry
+from .llvm_types   import BaseType_to_LLVM
+
 from llvmlite import ir, binding
 
 class Node:
@@ -42,7 +44,7 @@ class Program(Node):
         self.module  = None
         self.binding = None
         self.builder = None
-        self.c_symbol_table = SymbolTable()
+        self.c_symbol_table = SymbolTable(skip_builtins=True)
 
     def codegen_init(self):
         ''' Initializes  llvm '''
@@ -55,6 +57,18 @@ class Program(Node):
         self.module.triple = self.binding.get_default_triple()
 
         self.builder = None # the builder will be declared inside the function definition
+
+        for f in self.c_symbol_table.builtins:
+            name, type, args = f
+            arg_types_llvm = list(map(lambda arg: BaseType_to_LLVM(arg[1]), args))
+            ftype = ir.FunctionType(BaseType_to_LLVM(type), arg_types_llvm)
+            func_cvalue = ir.Function(self.module, ftype, name=name)
+            self.c_symbol_table.insert(name, FunctionEntry(
+                name,
+                type,
+                args,
+                cvalue = func_cvalue
+            ))
 
     def codegen(self):
         # pre-processing

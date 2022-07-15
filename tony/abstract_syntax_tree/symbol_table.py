@@ -58,27 +58,25 @@ class SymbolTable:
     def __init__(self, skip_builtins=False):
         self.scopes = []
         self.id = 0
-
+        self.builtins = [
+            ('puti', BaseType.Void, [('n', BaseType.Int, False)]),
+            ('putb', BaseType.Void, [('b', BaseType.Bool, False)]),
+            ('putc', BaseType.Void, [('c', BaseType.Char, False)]),
+            ('puts', BaseType.Void, [('s', Array(BaseType.Char), False)]),
+            ('geti', BaseType.Int, []),
+            ('getb', BaseType.Bool, []),
+            ('getc', BaseType.Char, []),
+            ('gets', BaseType.Void, [('n', BaseType.Int, False), ('s', Array(BaseType.Char), False)]),
+            ('abs', BaseType.Int, [('n', BaseType.Int, False)]),
+            ('ord', BaseType.Int, [('c', BaseType.Char, False)]),
+            ('chr', BaseType.Char, [('n', BaseType.Int, False)]),
+            ('strlen', BaseType.Int, [('s', Array(BaseType.Char), False)]),
+            ('strcmp', BaseType.Int, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
+            ('strcpy', BaseType.Void, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
+            ('strcat', BaseType.Void, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
+        ]
         if not skip_builtins:
-            builtin_funcs = [
-                ('puti', BaseType.Void, [('n', BaseType.Int, False)]),
-                ('putb', BaseType.Void, [('b', BaseType.Bool, False)]),
-                ('putc', BaseType.Void, [('c', BaseType.Char, False)]),
-                ('puts', BaseType.Void, [('s', Array(BaseType.Char), False)]),
-                ('geti', BaseType.Int, []),
-                ('getb', BaseType.Bool, []),
-                ('getc', BaseType.Char, []),
-                ('gets', BaseType.Void, [('n', BaseType.Int, False), ('s', Array(BaseType.Char), False)]),
-                ('abs', BaseType.Int, [('n', BaseType.Int, False)]),
-                ('ord', BaseType.Int, [('c', BaseType.Char, False)]),
-                ('chr', BaseType.Char, [('n', BaseType.Int, False)]),
-                ('strlen', BaseType.Int, [('s', Array(BaseType.Char), False)]),
-                ('strcmp', BaseType.Int, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
-                ('strcpy', BaseType.Void, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
-                ('strcat', BaseType.Void, [('s1', Array(BaseType.Char), False),('s1', Array(BaseType.Char), False)]),
-            ]
-
-            for f in builtin_funcs:
+            for f in self.builtins:
                 self.insert(f[0], FunctionEntry(f[0],f[1],f[2]))
 
 

@@ -62,7 +62,7 @@ class Program(Node):
             name, type, args = f
             arg_types_llvm = list(map(lambda arg: BaseType_to_LLVM(arg[1]), args))
             ftype = ir.FunctionType(BaseType_to_LLVM(type), arg_types_llvm)
-            func_cvalue = ir.Function(self.module, ftype, name=name)
+            func_cvalue = ir.Function(self.module, ftype, name=f'_{name}')
             self.c_symbol_table.insert(name, FunctionEntry(
                 name,
                 type,

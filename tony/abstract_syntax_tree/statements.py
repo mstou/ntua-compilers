@@ -354,7 +354,13 @@ class FunctionCall(Statement):
         params = []
 
         for e in self.expressions:
-            params.append(e.codegen(module, builder, symbol_table))
+            p = e.codegen(module, builder, symbol_table)
+            if isinstance(e, VarAtom):
+                val = builder.load(p)
+            else:
+                val = p
+            params.append(val)
+
 
         return builder.call(func_cvalue, params)
 

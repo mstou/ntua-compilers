@@ -3,46 +3,47 @@
 */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef int32_t integer;
 typedef int8_t boolean;
 typedef int8_t character;
 
-void puti(integer n){
+void _puti(integer n) {
   printf("%d", n);
 }
 
-void putb(boolean b){
+void _putb(boolean b) {
   b == 0 ? printf("false") : printf("true");
 }
 
-void putc(character c){
+void _putc(character c) {
   printf("%c", c);
 }
 
-void puts(character* s){
-  printf("%s", s);
+void _puts(character* s) {
+  printf("%s", (char *) s);
 }
 
-integer geti(){
+integer _geti() {
   integer n;
   scanf("%d", &n);
   return n;
 }
 
-boolean getb(){
+boolean _getb() {
   integer b;
   scanf("%d", &b);
   return (boolean) b;
 }
 
-character getc(){
+character _getc() {
   character c;
   scanf("%c", &c);
   return c;
 }
 
-character* gets(integer size, character *s){
+character* _gets(integer size, character *s) {
   if( size <= 0 ){
     return NULL;
   }
@@ -53,11 +54,39 @@ character* gets(integer size, character *s){
   int bytes_read = 0;
   character c;
 
-  while(bytes_read <= size-1){ // reserving one byte for \0
+  while(bytes_read <= size-1) { // reserving one byte for \0
     c = getchar();
     if (c == EOF || c == '\n') break;
     buffer[bytes_read++] = c;
   }
 
   strcpy((char *) s, (char *) buffer);
+}
+
+integer _abs(integer n) {
+  return abs(n);
+}
+
+integer _ord(character c) {
+  return (integer) c;
+}
+
+character _chr(integer n) {
+  return (character) n;
+}
+
+integer _strlen(character* s) {
+  return strlen((char *) s);
+}
+
+integer _strcmp(character* s1, character* s2) {
+  return strcmp((char *) s1, (char *) s2);
+}
+
+void _strcpy(character* s1, character* s2) {
+  return strcpy((char *) s1, (char *) s2);
+}
+
+void _strcat(character* s1, character* s2) {
+  return strcat((char *) s1, (char *) s2);
 }

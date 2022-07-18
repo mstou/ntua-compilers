@@ -43,13 +43,13 @@ character _getc() {
   return c;
 }
 
-character* _gets(integer size, character *s) {
+void _gets(integer size, character *s) {
   if( size <= 0 ){
-    return NULL;
+    return;
   }
 
   character buffer[size];
-  memset(bufffer, 0, size);
+  memset(buffer, 0, size);
 
   int bytes_read = 0;
   character c;
@@ -84,9 +84,9 @@ integer _strcmp(character* s1, character* s2) {
 }
 
 void _strcpy(character* s1, character* s2) {
-  return strcpy((char *) s1, (char *) s2);
+  strcpy((char *) s1, (char *) s2);
 }
 
 void _strcat(character* s1, character* s2) {
-  return strcat((char *) s1, (char *) s2);
+  strcat((char *) s1, (char *) s2);
 }

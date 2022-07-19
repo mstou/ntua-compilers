@@ -1,8 +1,11 @@
 from .node         import Node, indentation
 from .symbol_table import *
 from .data_types   import *
+from .llvm_types   import *
 from .atoms        import VarAtom
 from .expressions  import AtomArray
+
+from llvmlite import ir
 
 class Statement(Node):
     ''' Generic class for statements '''
@@ -88,6 +91,28 @@ class IfStatement(Statement):
             s.sem(symbol_table)
 
         return True
+
+    def codegen(self, module, builder, symbol_table):
+        cond = self.condition.codegen(module, builder, symbol_table)
+        cmp  = builder.icmp_unsigned('!=', cond, ir.Constant(LLVM_Types.Bool, 0))
+
+        then_bb  = builder.function.append_basic_block('then')
+        after_bb = ir.Block(builder.function, 'after')
+        builder.cbranch(cmp, then_bb, after_bb) # conditional branch
+
+        # Building the 'then' block
+        builder.position_at_start(then_bb)
+        for s in self.statements:
+            s.codegen(module, builder, symbol_table)
+
+        builder.branch(after_bb)
+
+        # then_bb = self.builder.block <- remember the block that then ends in
+        # for the phi function
+
+        builder.function.basic_blocks.append(after_bb)
+        builder.position_at_start(after_bb)
+
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'If Statement\n'
@@ -355,10 +380,12 @@ class FunctionCall(Statement):
 
         for e in self.expressions:
             p = e.codegen(module, builder, symbol_table)
+            val = p
             if isinstance(e, VarAtom):
-                val = builder.load(p)
-            else:
-                val = p
+                entry = symbol_table.lookup(e.name)
+                if not isinstance(entry, FunctionParam):
+                    val = builder.load(p)
+
             params.append(val)
 
 

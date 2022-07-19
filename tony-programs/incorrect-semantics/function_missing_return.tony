@@ -1,0 +1,4 @@
+def int f():
+    int x
+    x := 42
+end

@@ -1,0 +1,15 @@
+decl int g(int x)
+
+def int f(int x):
+    if x > 0:
+        return g(x-1)
+    end
+    return 0
+end
+
+def int g(int x):
+    if x > 0:
+        return f(x-1)
+    end
+    return 1
+end

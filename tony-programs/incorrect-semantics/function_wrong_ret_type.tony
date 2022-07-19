@@ -1,0 +1,3 @@
+def int f():
+  return 'a'
+end

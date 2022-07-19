@@ -1,0 +1,8 @@
+def int f():
+    return 42
+end
+
+def main():
+    bool b
+    b := f()
+end

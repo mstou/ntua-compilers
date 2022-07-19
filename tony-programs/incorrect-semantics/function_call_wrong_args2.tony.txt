@@ -1,0 +1,8 @@
+def int f(int x, bool y):
+    return x
+end
+
+def main():
+    int result
+    result := f(42, 17)
+end

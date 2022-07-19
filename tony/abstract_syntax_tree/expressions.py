@@ -139,7 +139,7 @@ class BinaryComparison(Expression):
         }
 
         if self.op in character_map:
-            builder.icmp_unsigned(character_map[self.op], lhs, rhs, name=f'comparisontmp{self.op}')
+            return builder.icmp_unsigned(character_map[self.op], lhs, rhs, name=f'comparisontmp{self.op}')
         else:
             return None
 

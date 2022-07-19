@@ -1,7 +1,9 @@
-from .node import Node, indentation
+from .node       import Node, indentation
 from .data_types import *
-from llvmlite import ir
 from .llvm_types import LLVM_Types
+from .atoms      import *
+
+from llvmlite import ir
 
 class Expression(Node):
     ''' Generic class for expressions '''
@@ -137,6 +139,12 @@ class BinaryComparison(Expression):
         '=': '==', '<>': '!=',
         '<': '<', '>': '>', '<=': '<=', '>=': '>='
         }
+
+        if isinstance(self.left, VarAtom):
+            lhs = builder.load(lhs)
+
+        if isinstance(self.right, VarAtom):
+            rhs = builder.load(rhs)
 
         if self.op in character_map:
             return builder.icmp_unsigned(character_map[self.op], lhs, rhs, name=f'comparisontmp{self.op}')

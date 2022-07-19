@@ -180,6 +180,8 @@ class FunctionHeader(Node):
             for name in f.names:
                 self.params.append((name, f.type, f.reference))
 
+        self.return_type_llvm = None
+        self.param_types_llvm = []
 
     def sem(self, symbol_table, decl = False):
         '''
@@ -214,6 +216,7 @@ class FunctionHeader(Node):
             name, t, ref = p
             type = t.sem(symbol_table) # calculate the actual type
             parameters.append((name,type,ref))
+            self.param_types_llvm.append(BaseType_to_LLVM(type))
 
         return_type = self.function_type.sem(symbol_table)
         self.return_type_llvm = BaseType_to_LLVM(return_type)
@@ -281,7 +284,7 @@ class FunctionHeader(Node):
             # the function is about to be declared or about to be defined and was
             # not previously declared.
             # declare the function type and add it to the scope
-            parameters = [BaseType_to_LLVM(p[1]) for p in self.params]
+            parameters = self.param_types_llvm
             ret_type   = self.return_type_llvm
             func_type = ir.FunctionType(ret_type, parameters)
             func_cvalue = ir.Function(module, func_type, name=self.function_name)

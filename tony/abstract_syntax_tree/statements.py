@@ -244,6 +244,31 @@ class IfElseStatement(Statement):
 
         return True
 
+    def codegen(self, module, builder, symbol_table):
+        cond = self.ifclause.condition.codegen(module, builder, symbol_table)
+        cmp  = builder.icmp_unsigned('!=', cond, ir.Constant(LLVM_Types.Bool, 0))
+
+        then_bb  = builder.function.append_basic_block('then')
+        else_bb  = ir.Block(builder.function, 'else')
+        after_bb = ir.Block(builder.function, 'after')
+        builder.cbranch(cmp, then_bb, else_bb) # conditional branch
+
+        # Building the 'then' block
+        builder.position_at_start(then_bb)
+        for s in self.ifclause.statements:
+            s.codegen(module, builder, symbol_table)
+        builder.branch(after_bb)
+
+        # Building the 'else' block
+        builder.function.basic_blocks.append(else_bb)
+        builder.position_at_start(else_bb)
+        for s in self.else_clause.statements:
+            s.codegen(module, builder, symbol_table)
+        builder.branch(after_bb)
+
+        builder.function.basic_blocks.append(after_bb)
+        builder.position_at_start(after_bb)
+
     def pprint(self, indent=0):
         return self.ifclause.pprint(indent) +\
                '\n' + self.else_clause.pprint(indent)

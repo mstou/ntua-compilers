@@ -63,7 +63,7 @@ class FuncDef(Node): # function definition
             calls the codegen() of all the statements
         '''
 
-        func = self.header.codegen(module, builder, symbol_table)
+        func = self.header.codegen(module, builder, symbol_table, main=main)
 
         entry_block = func.append_basic_block(f'{self.header.function_name}_entry')
 
@@ -279,7 +279,7 @@ class FunctionHeader(Node):
 
             return True
 
-    def codegen(self, module, builder, symbol_table, decl = False):
+    def codegen(self, module, builder, symbol_table, decl = False, main = False):
         '''
             We may have arrived here either from a declaration or
             from a function definition.
@@ -305,7 +305,8 @@ class FunctionHeader(Node):
             parameters = self.param_types_llvm
             ret_type   = self.return_type_llvm
             func_type = ir.FunctionType(ret_type, parameters)
-            func_cvalue = ir.Function(module, func_type, name=self.sanitize(self.function_name))
+            llvm_name = 'main' if main else self.sanitize(self.function_name)
+            func_cvalue = ir.Function(module, func_type, name=llvm_name)
 
             symbol_table.insert(self.function_name,
                 FunctionEntry(

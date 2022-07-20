@@ -6,4 +6,7 @@ def main():
     def int g(int y):
         return f(y-1)
     end
+
+    puti(g(50))
+
 end

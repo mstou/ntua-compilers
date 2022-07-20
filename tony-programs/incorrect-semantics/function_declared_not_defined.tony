@@ -1,0 +1,8 @@
+def main():
+    decl bool PeqNP?()
+
+    puts("The million dollar answer is: ")
+    putb(PeqNP?())
+    puts("\n")
+    
+end

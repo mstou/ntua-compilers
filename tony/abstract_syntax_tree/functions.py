@@ -33,7 +33,7 @@ class FuncDef(Node): # function definition
             2) Calls the sem of the rest of the components
         '''
 
-        self.header.sem(symbol_table, decl=False)
+        return_type = self.header.sem(symbol_table, decl=False)
 
         for v in self.vardefs:
             v.sem(symbol_table)
@@ -47,8 +47,15 @@ class FuncDef(Node): # function definition
         for stmt in self.statements:
             stmt.sem(symbol_table)
 
+        if not symbol_table.all_funcs_defined():
+            errormsg = 'Some functions were declared but not defined'
+            raise Exception(errormsg)
+
+        if return_type != BaseType.Void and not symbol_table.scope_has_returned():
+            errormsg = f'No return statement inside non-void function {self.header.function_name}'
+            raise Exception(errormsg)
+
         symbol_table.closeScope()
-        #TODO: check that there are no functions that are declared and not implemented in the closed scope
 
         return True
 
@@ -241,15 +248,17 @@ class FunctionHeader(Node):
 
         entry = symbol_table.lookup(self.function_name)
         if decl:
-            errormsg = f'Tried to declare a function with name {self.name} ' +\
-                        'but the name is already in use.'
-            raise Exception(errormsg)
+
+            if entry != None:
+                errormsg = f'Tried to declare a function with name {self.function_name} ' +\
+                            'but the name is already in use.'
+                raise Exception(errormsg)
 
             new_entry = FunctionEntry(self.function_name,\
                         return_type, parameters, defined=False\
                         )
             symbol_table.insert(self.function_name, new_entry)
-            return True
+            return return_type
 
         else:
             if entry != None and not isinstance(entry, FunctionEntry):
@@ -271,13 +280,13 @@ class FunctionHeader(Node):
                             )
                 symbol_table.insert(self.function_name, new_entry)
 
-                symbol_table.openScope()
+                symbol_table.openScope(self.function_name)
 
                 for n,t,ref in self.params:
                     type = t.sem(symbol_table)
                     symbol_table.insert(n, FunctionParam(n,type,ref))
 
-            return True
+            return return_type
 
     def codegen(self, module, builder, symbol_table, decl = False, main = False):
         '''

@@ -105,7 +105,7 @@ class IfStatement(Statement):
         for s in self.statements:
             s.codegen(module, builder, symbol_table)
 
-        builder.branch(after_bb)
+        if not builder.block.is_terminated: builder.branch(after_bb)
 
         # then_bb = self.builder.block <- remember the block that then ends in
         # for the phi function
@@ -257,14 +257,14 @@ class IfElseStatement(Statement):
         builder.position_at_start(then_bb)
         for s in self.ifclause.statements:
             s.codegen(module, builder, symbol_table)
-        builder.branch(after_bb)
+        if not self.block.is_terminated: builder.branch(after_bb)
 
         # Building the 'else' block
         builder.function.basic_blocks.append(else_bb)
         builder.position_at_start(else_bb)
         for s in self.else_clause.statements:
             s.codegen(module, builder, symbol_table)
-        builder.branch(after_bb)
+        if not self.block.is_terminated: builder.branch(after_bb)
 
         builder.function.basic_blocks.append(after_bb)
         builder.position_at_start(after_bb)
@@ -317,7 +317,7 @@ class IfFullStatement(Statement):
         builder.position_at_start(then_bb)
         for s in self.ifclause.statements:
             s.codegen(module, builder, symbol_table)
-        builder.branch(after_bb)
+        if not builder.block.is_terminated: builder.branch(after_bb)
 
         # Building all the elsif blocks
         for i, eif in enumerate(self.elsifs):
@@ -337,14 +337,15 @@ class IfFullStatement(Statement):
             builder.position_at_start(elsif_bb[i])
             for s in eif.statements:
                 s.codegen(module, builder, symbol_table)
-            builder.branch(after_bb)
+            if not builder.block.is_terminated: builder.branch(after_bb)
 
         # Building the 'else' block
         builder.function.basic_blocks.append(else_bb)
         builder.position_at_start(else_bb)
         for s in self.else_clause.statements:
             s.codegen(module, builder, symbol_table)
-        builder.branch(after_bb)
+        if not builder.block.is_terminated: builder.branch(after_bb)
+
 
         builder.function.basic_blocks.append(after_bb)
         builder.position_at_start(after_bb)

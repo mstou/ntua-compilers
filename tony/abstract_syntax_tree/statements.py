@@ -49,8 +49,29 @@ class ReturnStatement(Statement):
         self.expr = expr
 
     def sem(self, symbol_table):
-        return self.expr.sem(symbol_table)
-        #TODO: check that we are inside a function that returns the type we return.
+        type = self.expr.sem(symbol_table)
+
+        function_scope = symbol_table.get_scope_name()
+
+        entry = symbol_table.lookup(function_scope)
+
+        if function_scope == None or entry == None or not isinstance(entry, FunctionEntry):
+            errormsg = f'Return statement in wrong scope'
+            raise Exception(errormsg)
+
+        expected_type = entry.return_type
+
+        if entry.return_type == BaseType.Void:
+            errormsg = f'Return statement in void function'
+            raise Exception(errormsg)
+
+        if entry.return_type != type:
+            errormsg = f'Wrong return type inside function {function_scope}. '+\
+                       f'Expected {entry.return_type} but got {type} instead.'
+
+        symbol_table.register_return_statement()
+        
+        return True
 
     def codegen(self, module, builder, symbol_table):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
@@ -473,6 +494,12 @@ class FunctionCall(Statement):
             raise Exception(errormsg)
 
         params = f.params
+
+        if len(params) != len(self.expressions):
+            errormsg = f'Wrong number of arguments provided for function {self.name}'+\
+                       f'Expected {len(params)} parameters but got {len(self.expressions)}'
+
+            raise Exception(errormsg)
 
         for e, param in zip(self.expressions,params):
             expected_type = param[1]

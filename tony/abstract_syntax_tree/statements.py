@@ -390,6 +390,38 @@ class ForLoop(Statement):
 
         return True
 
+    def codegen(self, module, builder, symbol_table):
+
+        # creating the basic blocks
+        loopcond  = ir.Block(builder.function, 'loopcond')
+        loopbody  = ir.Block(builder.function, 'loopbody')
+        afterloop = ir.Block(builder.function, 'afterloop')
+
+        # codegen the initial statements and branch to loop condition
+        self.initial.codegen(module, builder, symbol_table)
+        builder.branch(loopcond)
+
+        # building the loop condition and branch in body or after the loop
+        builder.function.basic_blocks.append(loopcond)
+        builder.position_at_start(loopcond)
+        cond = self.condition.codegen(module, builder, symbol_table)
+        cmp  = builder.icmp_unsigned('!=', cond, ir.Constant(LLVM_Types.Bool, 0))
+        builder.cbranch(cmp, loopbody, afterloop)
+
+        # building the loop body
+        builder.function.basic_blocks.append(loopbody)
+        builder.position_at_start(loopbody)
+        for s in self.statements:
+            s.codegen(module, builder, symbol_table)
+        self.ending.codegen(module, builder, symbol_table)
+        builder.branch(loopcond)
+
+        # basic block after the loop
+        builder.function.basic_blocks.append(afterloop)
+        builder.position_at_start(afterloop)
+
+        return None
+
     def pprint(self, indent=0):
         s = indentation(indent) + 'For Loop\n'
 
@@ -550,6 +582,12 @@ class SimpleList(Statement):
             s.sem(symbol_table)
 
         return True
+
+    def codegen(self, module, builder, symbol_table):
+        for s in self.simples:
+            s.codegen(module, builder, symbol_table)
+
+        return None
 
     def pprint(self, indent=0):
         s = indentation(indent) + 'List of Simples\n'

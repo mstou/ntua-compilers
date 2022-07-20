@@ -40,8 +40,10 @@ class FunctionEntry(SymbolEntry):
         return s
 
 class Scope:
-    def __init__(self):
+    def __init__(self, func_name=None):
         self.locals = dict()
+        self.func_name = func_name
+        self.returned  = False
 
     def lookup(self, s):
         if s in self.locals.keys():
@@ -79,9 +81,8 @@ class SymbolTable:
             for f in self.builtins:
                 self.insert(f[0], FunctionEntry(f[0],f[1],f[2]))
 
-
-    def openScope(self):
-        self.scopes.append(Scope())
+    def openScope(self, name=None):
+        self.scopes.append(Scope(name))
 
     def closeScope(self):
         self.scopes.pop()
@@ -99,6 +100,29 @@ class SymbolTable:
                 return name
 
         return None
+
+    def register_return_statement(self):
+        self.scopes[-1].returned = True
+
+    def scope_has_returned(self):
+        return self.scopes[-1].returned
+
+    def get_scope_name(self):
+        return self.scopes[-1].func_name
+
+    def all_funcs_defined(self):
+        ''' Checks if all functions that were declared
+            in the last scope are also defined
+        '''
+        sc = self.scopes[-1].locals
+
+        for name in sc:
+            entry = sc[name]
+            if isinstance(entry, FunctionEntry):
+                if not entry.defined:
+                    return False
+
+        return True
 
     def lookup_current_scope(self, s):
         return self.scopes[-1].lookup(s)

@@ -280,11 +280,11 @@ class FunctionHeader(Node):
                             )
                 symbol_table.insert(self.function_name, new_entry)
 
-                symbol_table.openScope(self.function_name)
+            symbol_table.openScope(self.function_name)
 
-                for n,t,ref in self.params:
-                    type = t.sem(symbol_table)
-                    symbol_table.insert(n, FunctionParam(n,type,ref))
+            for n,t,ref in self.params:
+                type = t.sem(symbol_table)
+                symbol_table.insert(n, FunctionParam(n,type,ref))
 
             return return_type
 

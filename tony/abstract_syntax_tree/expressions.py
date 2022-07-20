@@ -1,7 +1,8 @@
-from .node       import Node, indentation
-from .data_types import *
-from .llvm_types import LLVM_Types
-from .atoms      import *
+from .node         import Node, indentation
+from .data_types   import *
+from .llvm_types   import LLVM_Types
+from .atoms        import *
+from .symbol_table import FunctionParam
 
 from llvmlite import ir
 
@@ -40,7 +41,7 @@ class ParenthesisExpr(Expression):
 
 class BinaryOperator(Expression):
     ''' Node for binary arithmetic expressions.
-        Operators are: +, -, *, /, %
+        Operators are: +, -, *, /, mod
     '''
     def __init__(self, left, op, right):
         self.left  = left
@@ -74,10 +75,14 @@ class BinaryOperator(Expression):
         rhs = self.right.codegen(module, builder, symbol_table)
 
         if isinstance(self.left, VarAtom):
-            lhs = builder.load(lhs)
+            lhs_entry = symbol_table.lookup(self.left.name)
+            if not isinstance(lhs_entry, FunctionParam):
+                lhs = builder.load(lhs)
 
         if isinstance(self.right, VarAtom):
-            rhs = builder.load(rhs)
+            rhs_entry = symbol_table.lookup(self.right.name)
+            if not isinstance(rhs_entry, FunctionParam):
+                rhs = builder.load(rhs)
 
         if self.op == '+':
             return builder.add(lhs, rhs, name='addtmp')
@@ -87,7 +92,7 @@ class BinaryOperator(Expression):
             return builder.mul(lhs, rhs, name='multmp')
         elif self.op == '/':
             return builder.sdiv(lhs, rhs, name='divtmp')
-        elif self.op == '%':
+        elif self.op == 'mod':
             return builder.srem(lhs, rhs, name='divtmp')
         else:
             return None
@@ -147,10 +152,14 @@ class BinaryComparison(Expression):
         }
 
         if isinstance(self.left, VarAtom):
-            lhs = builder.load(lhs)
+            lhs_entry = symbol_table.lookup(self.left.name)
+            if not isinstance(lhs_entry, FunctionParam):
+                lhs = builder.load(lhs)
 
         if isinstance(self.right, VarAtom):
-            rhs = builder.load(rhs)
+            rhs_entry = symbol_table.lookup(self.right.name)
+            if not isinstance(rhs_entry, FunctionParam):
+                rhs = builder.load(rhs)
 
         if self.op in character_map:
             return builder.icmp_unsigned(character_map[self.op], lhs, rhs, name=f'comparisontmp{self.op}')
@@ -183,7 +192,9 @@ class Not(Expression):
         expr = self.expr.codegen(module, builder, symbol_table)
 
         if isinstance(self.expr, VarAtom):
-            expr = builder.load(expr)
+            var_entry = symbol_table.lookup(self.expr.name)
+            if not isinstance(var_entry, FunctionParam):
+                expr = builder.load(expr)
 
         return builder.not_(expr, name = 'nottmp')
 
@@ -230,10 +241,16 @@ class BinaryBoolean(Expression):
         rhs = self.right.codegen(module, builder, symbol_table)
 
         if isinstance(self.left, VarAtom):
-            lhs = builder.load(lhs)
+            lhs_entry = symbol_table.lookup(self.left.name)
+            if not isinstance(lhs_entry, FunctionParam):
+                lhs = builder.load(lhs)
+
 
         if isinstance(self.right, VarAtom):
-            rhs = builder.load(rhs)
+            rhs_entry = symbol_table.lookup(self.right.name)
+            if not isinstance(rhs_entry, FunctionParam):
+                lhs = builder.load(rhs)
+
 
         if self.op == 'and':
             return builder.and_(lhs, rhs, name = 'andtmp')

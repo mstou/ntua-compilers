@@ -1,8 +1,10 @@
-def int f(int x):
-    return 42
-end
-
 def main():
-    int result
-    result := f(42, 17)
+    def int f(int x):
+        return 42
+    end
+
+    def g():
+        int result
+        result := f(42, 17)
+    end
 end

@@ -1,8 +1,15 @@
-def int f():
-    return 42
-end
-
 def main():
-    int x
-    x := f()
+    def int f():
+        return 42
+    end
+
+    def int g():
+        int x
+        x := f()
+        return x
+    end
+
+    int result
+    result := g()
+    puti(result)
 end

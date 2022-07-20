@@ -1,10 +1,10 @@
 def main():
-    def int f(int x):
+    def int f(int x; bool y):
         return x
     end
 
     def g():
         int result
-        result := f(true)
+        result := f(42, 17)
     end
 end

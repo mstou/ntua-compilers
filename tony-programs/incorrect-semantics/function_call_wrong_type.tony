@@ -1,8 +1,10 @@
-def int f():
-    return 42
-end
-
 def main():
-    bool b
-    b := f()
+    def int f():
+        return 42
+    end
+
+    def g():
+        bool b
+        b := f()
+    end
 end

@@ -73,6 +73,12 @@ class BinaryOperator(Expression):
         lhs = self.left.codegen(module, builder, symbol_table)
         rhs = self.right.codegen(module, builder, symbol_table)
 
+        if isinstance(self.left, VarAtom):
+            lhs = builder.load(lhs)
+
+        if isinstance(self.right, VarAtom):
+            rhs = builder.load(rhs)
+
         if self.op == '+':
             return builder.add(lhs, rhs, name='addtmp')
         elif self.op == '-':
@@ -175,6 +181,10 @@ class Not(Expression):
 
     def codegen(self, module, builder, symbol_table):
         expr = self.expr.codegen(module, builder, symbol_table)
+
+        if isinstance(self.expr, VarAtom):
+            expr = builder.load(expr)
+
         return builder.not_(expr, name = 'nottmp')
 
     def pprint(self, indent=0):
@@ -218,6 +228,12 @@ class BinaryBoolean(Expression):
     def codegen(self, module, builder, symbol_table):
         lhs = self.left.codegen(module, builder, symbol_table)
         rhs = self.right.codegen(module, builder, symbol_table)
+
+        if isinstance(self.left, VarAtom):
+            lhs = builder.load(lhs)
+
+        if isinstance(self.right, VarAtom):
+            rhs = builder.load(rhs)
 
         if self.op == 'and':
             return builder.and_(lhs, rhs, name = 'andtmp')

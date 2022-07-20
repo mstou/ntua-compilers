@@ -86,6 +86,11 @@ class FuncDef(Node): # function definition
 
             if self.header.return_type_llvm == BaseType_to_LLVM(BaseType.Void):
                 builder.ret_void()
+
+            elif len(builder.block.instructions) == 0:
+                # empty block and hence unreachable
+                builder.unreachable()
+
             symbol_table.closeScope()
 
         return func
@@ -182,6 +187,19 @@ class FunctionHeader(Node):
 
         self.return_type_llvm = None
         self.param_types_llvm = []
+
+    def sanitize(self, name):
+        '''
+            This is a function name sanitizer because x86 complains
+            about the use of english question marks in names
+        '''
+
+        new_name = name
+
+        if '?' in name:
+            new_name = '_' + name.replace('?','_')
+
+        return new_name
 
     def sem(self, symbol_table, decl = False):
         '''
@@ -287,7 +305,7 @@ class FunctionHeader(Node):
             parameters = self.param_types_llvm
             ret_type   = self.return_type_llvm
             func_type = ir.FunctionType(ret_type, parameters)
-            func_cvalue = ir.Function(module, func_type, name=self.function_name)
+            func_cvalue = ir.Function(module, func_type, name=self.sanitize(self.function_name))
 
             symbol_table.insert(self.function_name,
                 FunctionEntry(

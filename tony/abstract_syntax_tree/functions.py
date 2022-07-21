@@ -305,9 +305,11 @@ class FunctionHeader(Node):
         '''
 
         if not decl:
-            func_cvalue = symbol_table.lookup(self.function_name)
+            function_entry = symbol_table.lookup(self.function_name)
+            if function_entry != None:
+                func_cvalue = function_entry.cvalue
 
-        if func_cvalue == None or decl:
+        if function_entry == None or decl:
             # the function is about to be declared or about to be defined and was
             # not previously declared.
             # declare the function type and add it to the scope

@@ -70,11 +70,17 @@ class ReturnStatement(Statement):
                        f'Expected {entry.return_type} but got {type} instead.'
 
         symbol_table.register_return_statement()
-        
+
         return True
 
     def codegen(self, module, builder, symbol_table):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if isinstance(self.expr, VarAtom):
+            var_entry = symbol_table.lookup(self.expr.name)
+            if not isinstance(var_entry, FunctionParam):
+                expr_cvalue = builder.load(expr_cvalue)
+
         return builder.ret(expr_cvalue)
 
     def pprint(self, indent=0):
@@ -574,7 +580,9 @@ class Assignment(Statement):
         atom_cvalue = self.atom.codegen(module, builder, symbol_table) # performs a lookup and returns the cvalue
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
 
-        builder.store(expr_cvalue, atom_cvalue)
+        entry = symbol_table.lookup(self.atom.name)
+        if not isinstance(entry, FunctionParam):
+            builder.store(expr_cvalue, atom_cvalue)
 
         return None
 

@@ -1,14 +1,6 @@
 import pytest
 from context import *
 
-PROGRAMS_PREFIX = 'tony-programs/'
-SEMANTICS_TESTS = PROGRAMS_PREFIX + 'incorrect-semantics/'
-
-def readFile(file, prefix = PROGRAMS_PREFIX):
-    with open(prefix + file, 'r', encoding = 'unicode_escape') as f:
-        s = f.read()
-    return s
-
 @pytest.mark.semantics
 def test_array_invalid_index():
     input = readFile('array_invalid_index.tony', prefix = SEMANTICS_TESTS)

@@ -1,12 +1,5 @@
 import pytest
-from context import parser
-
-PATH_PREFIX = 'tony-programs/'
-
-def readFile(file):
-    with open(PATH_PREFIX + file, 'r', encoding = 'unicode_escape') as f:
-        s = f.read()
-    return s
+from context import parser, readFile
 
 @pytest.mark.parser
 def test_bubblesort():

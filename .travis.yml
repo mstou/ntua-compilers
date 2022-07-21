@@ -4,7 +4,5 @@ python:
 before_install:
   - python --version
   - pip install -U pip
-  - pip install -U pytest
-  - pip install -U ply
-  - pip install -U llvmlite
+  - make install
 script: pytest # run tests

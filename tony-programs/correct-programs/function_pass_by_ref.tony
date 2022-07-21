@@ -1,0 +1,24 @@
+def main():
+  int x
+
+  def printInteger(int x):
+    puti(x)
+    puts("\n")
+  end
+
+  def f(ref int x):
+    x := 73
+  end
+
+  def g(int x):
+    x := 17
+  end
+
+  x := 42
+  printInteger(x)
+  f(x)
+  printInteger(x)
+  g(x)
+  printInteger(x)
+
+end

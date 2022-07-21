@@ -2,7 +2,7 @@ from .node         import Node, indentation
 from .symbol_table import *
 from .data_types   import *
 from .llvm_types   import *
-from .atoms        import VarAtom
+from .atoms        import VarAtom, should_load_or_store
 from .expressions  import AtomArray
 
 from llvmlite import ir
@@ -519,16 +519,18 @@ class FunctionCall(Statement):
         return f.return_type
 
     def codegen(self, module, builder, symbol_table):
-        func_cvalue = symbol_table.lookup(self.name).cvalue
+        function_entry = symbol_table.lookup(self.name)
+        func_cvalue    = function_entry.cvalue
+
         params = []
 
-        for e in self.expressions:
+        for e, exp_param in zip(self.expressions, function_entry.params):
             p = e.codegen(module, builder, symbol_table)
             val = p
-            if isinstance(e, VarAtom):
-                entry = symbol_table.lookup(e.name)
-                if not isinstance(entry, FunctionParam):
-                    val = builder.load(p)
+            by_ref = exp_param[2]
+
+            if should_load_or_store(e, symbol_table) and not by_ref:
+                val = builder.load(p)
 
             params.append(val)
 
@@ -581,7 +583,7 @@ class Assignment(Statement):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
 
         entry = symbol_table.lookup(self.atom.name)
-        if not isinstance(entry, FunctionParam):
+        if should_load_or_store(self.atom, symbol_table):
             builder.store(expr_cvalue, atom_cvalue)
 
         return None

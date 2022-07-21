@@ -1,11 +1,27 @@
-from .node       import Node, indentation
-from .data_types import *
-from .llvm_types import LLVM_Types
+from .node         import Node, indentation
+from .data_types   import *
+from .llvm_types   import LLVM_Types
+from .symbol_table import FunctionParam
 
 import re
 from llvmlite import ir
 
 escape_newline = lambda x: re.sub('\n', lambda _: '\\n', str(x))
+
+def should_load_or_store(expression, symbol_table):
+    # global variables and function params that
+    # are passed by reference must be loaded before used
+    # and stored after assignments
+    if not isinstance(expression, VarAtom):
+        return False
+
+    # the expression is a variable
+    var_entry = symbol_table.lookup(expression.name)
+
+    if isinstance(var_entry, FunctionParam):
+        return var_entry.reference
+
+    return True
 
 class Atom(Node):
     ''' Generic class for atoms '''

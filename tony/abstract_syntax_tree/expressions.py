@@ -2,7 +2,6 @@ from .node         import Node, indentation
 from .data_types   import *
 from .llvm_types   import LLVM_Types
 from .atoms        import *
-from .symbol_table import FunctionParam
 
 from llvmlite import ir
 
@@ -74,15 +73,11 @@ class BinaryOperator(Expression):
         lhs = self.left.codegen(module, builder, symbol_table)
         rhs = self.right.codegen(module, builder, symbol_table)
 
-        if isinstance(self.left, VarAtom):
-            lhs_entry = symbol_table.lookup(self.left.name)
-            if not isinstance(lhs_entry, FunctionParam):
-                lhs = builder.load(lhs)
+        if should_load_or_store(self.left, symbol_table):
+            lhs = builder.load(lhs)
 
-        if isinstance(self.right, VarAtom):
-            rhs_entry = symbol_table.lookup(self.right.name)
-            if not isinstance(rhs_entry, FunctionParam):
-                rhs = builder.load(rhs)
+        if should_load_or_store(self.right, symbol_table):
+            rhs = builder.load(rhs)
 
         if self.op == '+':
             return builder.add(lhs, rhs, name='addtmp')
@@ -151,15 +146,11 @@ class BinaryComparison(Expression):
         '<': '<', '>': '>', '<=': '<=', '>=': '>='
         }
 
-        if isinstance(self.left, VarAtom):
-            lhs_entry = symbol_table.lookup(self.left.name)
-            if not isinstance(lhs_entry, FunctionParam):
-                lhs = builder.load(lhs)
+        if should_load_or_store(self.left, symbol_table):
+            lhs = builder.load(lhs)
 
-        if isinstance(self.right, VarAtom):
-            rhs_entry = symbol_table.lookup(self.right.name)
-            if not isinstance(rhs_entry, FunctionParam):
-                rhs = builder.load(rhs)
+        if should_load_or_store(self.right, symbol_table):
+            rhs = builder.load(rhs)
 
         if self.op in character_map:
             return builder.icmp_unsigned(character_map[self.op], lhs, rhs, name=f'comparisontmp{self.op}')
@@ -191,10 +182,8 @@ class Not(Expression):
     def codegen(self, module, builder, symbol_table):
         expr = self.expr.codegen(module, builder, symbol_table)
 
-        if isinstance(self.expr, VarAtom):
-            var_entry = symbol_table.lookup(self.expr.name)
-            if not isinstance(var_entry, FunctionParam):
-                expr = builder.load(expr)
+        if should_load_or_store(self.expr, symbol_table):
+            expr = builder.load(expr)
 
         return builder.not_(expr, name = 'nottmp')
 
@@ -240,17 +229,11 @@ class BinaryBoolean(Expression):
         lhs = self.left.codegen(module, builder, symbol_table)
         rhs = self.right.codegen(module, builder, symbol_table)
 
-        if isinstance(self.left, VarAtom):
-            lhs_entry = symbol_table.lookup(self.left.name)
-            if not isinstance(lhs_entry, FunctionParam):
-                lhs = builder.load(lhs)
+        if should_load_or_store(self.left, symbol_table):
+            lhs = builder.load(lhs)
 
-
-        if isinstance(self.right, VarAtom):
-            rhs_entry = symbol_table.lookup(self.right.name)
-            if not isinstance(rhs_entry, FunctionParam):
-                lhs = builder.load(rhs)
-
+        if should_load_or_store(self.right, symbol_table):
+            rhs = builder.load(rhs)
 
         if self.op == 'and':
             return builder.and_(lhs, rhs, name = 'andtmp')
@@ -445,6 +428,10 @@ class UniArithmeticMINUS(Expression):
 
     def codegen(self, module, builder, symbol_table):
         expr = self.expr.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.expr, symbol_table):
+            expr = builder.load(expr)
+
         return builder.neg(expr, 'unaryminustmp')
 
     def pprint(self, indent=0):

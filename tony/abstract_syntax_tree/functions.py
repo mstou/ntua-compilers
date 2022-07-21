@@ -1,6 +1,7 @@
 from .node         import Node, indentation
 from .symbol_table import *
 from .llvm_types   import BaseType_to_LLVM
+from .atoms        import should_load_or_store
 from llvmlite      import ir
 
 class FuncDef(Node): # function definition
@@ -241,7 +242,12 @@ class FunctionHeader(Node):
             name, t, ref = p
             type = t.sem(symbol_table) # calculate the actual type
             parameters.append((name,type,ref))
-            self.param_types_llvm.append(BaseType_to_LLVM(type))
+
+            llvm_type = BaseType_to_LLVM(type)
+            if ref:
+                llvm_type = llvm_type.as_pointer()
+
+            self.param_types_llvm.append(llvm_type)
 
         return_type = self.function_type.sem(symbol_table)
         self.return_type_llvm = BaseType_to_LLVM(return_type)

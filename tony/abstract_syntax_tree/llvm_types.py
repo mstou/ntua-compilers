@@ -1,5 +1,5 @@
 from llvmlite import ir
-from .data_types import BaseType, Array
+from .data_types   import BaseType, Array
 
 def BaseType_to_LLVM(type):
     if type == BaseType.Int:

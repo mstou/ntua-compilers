@@ -4,5 +4,5 @@ python:
 before_install:
   - python --version
   - pip install -U pip
-  - make install
-script: pytest # run tests
+  - pip install -r requirements.txt
+script: pytest -m "not end2end" # run tests

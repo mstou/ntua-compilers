@@ -359,7 +359,7 @@ class BooleanValue(Expression):
 
 class CharValue(Expression):
     def __init__(self, data):
-        self.data = data
+        self.data = data[1:-1]
 
     def sem(self, symbol_table):
         return BaseType.Char
@@ -407,6 +407,9 @@ class AtomArray(Expression):
             array_ptr = builder.load(array_ptr)
 
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.expr, symbol_table):
+            expr_cvalue = builder.load(expr_cvalue)
 
         pointer_to_elem = builder.gep(array_ptr, [expr_cvalue])
 

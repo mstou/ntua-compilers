@@ -583,6 +583,9 @@ class Assignment(Statement):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
 
         entry = symbol_table.lookup(self.atom.name)
+        if should_load_or_store(self.expr, symbol_table):
+            expr_cvalue = builder.load(expr_cvalue)
+
         if should_load_or_store(self.atom, symbol_table):
             builder.store(expr_cvalue, atom_cvalue)
 

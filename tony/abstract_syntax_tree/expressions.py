@@ -378,6 +378,7 @@ class AtomArray(Expression):
     def __init__(self, atom, expr):
         self.atom = atom
         self.expr = expr
+        self.name = atom.name
 
     def sem(self, symbol_table):
         '''
@@ -398,6 +399,18 @@ class AtomArray(Expression):
             raise Exception(errormsg)
 
         return atom_type.t
+
+    def codegen(self, module, builder, symbol_table):
+        array_ptr = self.atom.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.atom, symbol_table):
+            array_ptr = builder.load(array_ptr)
+
+        expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        pointer_to_elem = builder.gep(array_ptr, [expr_cvalue])
+
+        return pointer_to_elem
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.atom}[ . ]\n'+\
@@ -478,7 +491,13 @@ class NewArray(Expression):
             errormsg = f'The length of an array can only be of type {BaseType.Int}'
             raise Exception(errormsg)
 
-        return Array(self.type.sem(symbol_table))
+        type = self.type.sem(symbol_table)
+        self.llvm_array_type = BaseType_to_LLVM(type)
+        return Array(type)
+
+    def codegen(self, module, builder, symbol_table):
+        expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+        return builder.alloca(self.llvm_array_type, expr_cvalue)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}new array {self.type} of length\n'+\

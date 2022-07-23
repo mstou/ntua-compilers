@@ -1,7 +1,6 @@
 from .node         import Node, indentation
 from .symbol_table import *
 from .llvm_types   import BaseType_to_LLVM
-from .atoms        import should_load_or_store
 from llvmlite      import ir
 
 class FuncDef(Node): # function definition

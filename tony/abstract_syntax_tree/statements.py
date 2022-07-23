@@ -2,8 +2,8 @@ from .node         import Node, indentation
 from .symbol_table import *
 from .data_types   import *
 from .llvm_types   import *
-from .atoms        import VarAtom, should_load_or_store
-from .expressions  import AtomArray
+from .atoms        import VarAtom
+from .expressions  import AtomArray, should_load_or_store
 
 from llvmlite import ir
 

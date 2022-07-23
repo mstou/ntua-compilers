@@ -1,9 +1,29 @@
 from .node         import Node, indentation
 from .data_types   import *
-from .llvm_types   import LLVM_Types
-from .atoms        import *
+from .llvm_types   import LLVM_Types, BaseType_to_LLVM
+from .symbol_table import FunctionParam
+from .atoms        import VarAtom
 
 from llvmlite import ir
+
+def should_load_or_store(expression, symbol_table):
+    # global variables and function params that
+    # are passed by reference must be loaded before used
+    # and stored after assignments
+    if isinstance(expression, AtomArray):
+        return True
+
+    if not isinstance(expression, VarAtom):
+        return False
+
+    # the expression is a variable
+    var_entry = symbol_table.lookup(expression.name)
+
+    if isinstance(var_entry, FunctionParam):
+        return var_entry.reference
+
+    return True
+
 
 class Expression(Node):
     ''' Generic class for expressions '''

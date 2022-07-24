@@ -349,7 +349,7 @@ class BooleanValue(Expression):
         return BaseType.Bool
 
     def codegen(self, module, builder, symbol_table):
-        return ir.Constant(LLVM_Types.Bool, 1 if self.data else 0)
+        return ir.Constant(LLVM_Types.Bool, 1 if self.data=="true" else 0)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}{self.data}'

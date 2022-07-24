@@ -7,13 +7,13 @@ def main():
                 return false
             end
         end
-        return true 
+        return true
     end
 
-    puts(isPalindrome(""))
-    puts(isPalindrome("a"))
-    puts(isPalindrome("aaabbb"))
-    puts(isPalindrome("aabaa"))
-    puts(isPalindrome("ab"))
-    puts(isPalindrome("aaaabaaa"))
+    putb(isPalindrome(""))         puts("\n")
+    putb(isPalindrome("a"))        puts("\n")
+    putb(isPalindrome("aaabbb"))   puts("\n")
+    putb(isPalindrome("aabaa"))    puts("\n")
+    putb(isPalindrome("ab"))       puts("\n")
+    putb(isPalindrome("aaaabaaa")) puts("\n")
 end

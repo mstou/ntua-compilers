@@ -322,6 +322,13 @@ class EmptyListNode(Expression):
     def pprint(self, indent=0):
         return f'{indentation(indent)}{BaseType.Void}'
 
+    def codegen(self, module, builder, symbol_table, type):
+        # expects the type of list to construct
+        # a nullptr for the correct data_type
+
+        node = BaseType_to_LLVM(type)
+        return ir.Constant(node.as_pointer(), None)
+
     def __str__(self):
         return self.pprint()
 
@@ -537,6 +544,7 @@ class ListOperator(Expression):
     def __init__(self, left, right):
         self.head = left
         self.tail = right
+        self.head_type = None
 
     def sem(self, symbol_table):
         '''
@@ -547,6 +555,8 @@ class ListOperator(Expression):
         '''
         head_type = self.head.sem(symbol_table)
         tail_type = self.tail.sem(symbol_table)
+
+        self.head_type = List(head_type)
 
         if tail_type != BaseType.Nil or tail_type != List(head_type):
             errormsg = f'Incompatible types of head and tail. Expected' +\
@@ -567,6 +577,7 @@ class ListOperator(Expression):
 class TailOperator(Expression):
     def __init__(self, expr):
         self.expr = expr
+        self.expr_type = None
 
     def sem(self, symbol_table):
         '''
@@ -576,6 +587,8 @@ class TailOperator(Expression):
         '''
 
         t = self.expr.sem(symbol_table)
+
+        self.expr_type = t
 
         if not isinstance(t, List):
             errormsg = f'Tail operator can not be used with type {t}.'
@@ -593,6 +606,7 @@ class TailOperator(Expression):
 class HeadOperator(Expression):
     def __init__(self, expr):
         self.expr = expr
+        self.expr_type = None
 
     def sem(self, symbol_table):
         '''
@@ -602,6 +616,8 @@ class HeadOperator(Expression):
         '''
 
         t = self.expr.sem(symbol_table)
+
+        self.expr_type = t
 
         if not isinstance(t, List):
             errormsg = f'Head operator can not be used with type {t}.'

@@ -50,3 +50,18 @@ def test_string_reverse():
     assert result.stdout.decode("utf-8") == expected_output
 
     os.remove('a.out')
+
+@pytest.mark.end2end
+def test_is_palindrome():
+    compile(CORRECT_PROGRAMS + 'is_palindrome.tony')
+
+    result = subprocess.run('./a.out', shell=True, stdout=subprocess.PIPE)
+    output_file = TEST_INPUTS + 'is_palindrome/output.txt'
+    expected_output = ''
+
+    with open(output_file, 'r') as f:
+        expected_output = f.read()
+
+    assert result.stdout.decode("utf-8") == expected_output
+
+    os.remove('a.out')

@@ -1,0 +1,19 @@
+def main():
+    def bool isPalindrome(char[] s):
+        int i, l
+        l := strlen(s)
+        for i := 0; i < l; i := i + 1:
+            if s[i] <> s[l-i-1]:
+                return false
+            end
+        end
+        return true 
+    end
+
+    puts(isPalindrome(""))
+    puts(isPalindrome("a"))
+    puts(isPalindrome("aaabbb"))
+    puts(isPalindrome("aabaa"))
+    puts(isPalindrome("ab"))
+    puts(isPalindrome("aaaabaaa"))
+end

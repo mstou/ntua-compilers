@@ -561,7 +561,14 @@ class ListOperator(Expression):
         self.list_type = List(head_type)
         self.tail_type = tail_type
 
-        if tail_type != BaseType.Nil and tail_type != List(head_type):
+        if not isinstance(tail_type, List):
+            if isinstance(tail_type, BaseType) and tail_type != BaseType.Nil:
+                errormsg = f'List operator (#) expects a list as a second argument '+\
+                           f'but {tail_type} was given'
+
+                raise Exception(errormsg)
+
+        if not isinstance(tail_type, BaseType) and tail_type != List(head_type):
             errormsg = f'Incompatible types of head and tail. Expected ' +\
                        f'{List(head_type)} but got {tail_type} instead.'
 

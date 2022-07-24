@@ -1,6 +1,7 @@
 from .node         import Node, indentation
 from .symbol_table import *
 from .llvm_types   import BaseType_to_LLVM
+from .data_types   import List
 from llvmlite      import ir
 
 class FuncDef(Node): # function definition
@@ -243,13 +244,15 @@ class FunctionHeader(Node):
             parameters.append((name,type,ref))
 
             llvm_type = BaseType_to_LLVM(type)
-            if ref:
+            if ref or isinstance(type, List):
                 llvm_type = llvm_type.as_pointer()
 
             self.param_types_llvm.append(llvm_type)
 
         return_type = self.function_type.sem(symbol_table)
         self.return_type_llvm = BaseType_to_LLVM(return_type)
+        if isinstance(return_type, List):
+            self.return_type_llvm = self.return_type_llvm.as_pointer()
 
         entry = symbol_table.lookup(self.function_name)
         if decl:
@@ -344,9 +347,7 @@ class FunctionHeader(Node):
             for i, arg in enumerate(func_cvalue.args):
                 n, t, ref = self.params[i]
                 cvalue = arg
-                symbol_table.insert(n, FunctionParam(n,type,ref,cvalue=cvalue))
-                # TODO: t is not a BaseType, change all nodes to save their llvm type in a variable
-                # TODO: implement reference variables
+                symbol_table.insert(n, FunctionParam(n,t,ref,cvalue=cvalue))
 
         return func_cvalue
 

@@ -7,11 +7,11 @@ from .atoms        import VarAtom
 from llvmlite import ir
 
 def should_load_or_store(expression, symbol_table):
-    # global variables, arrays, lists and function params that
+    # global variables, arrays and function params that
     # are passed by reference must be loaded before use
     # and stored after assignments
 
-    if isinstance(expression, AtomArray) or isinstance(expression, List):
+    if isinstance(expression, AtomArray):
         return True
 
     if not isinstance(expression, VarAtom):
@@ -323,7 +323,7 @@ class EmptyListNode(Expression):
     def pprint(self, indent=0):
         return f'{indentation(indent)}{BaseType.Nil}'
 
-    def codegen(self, module, builder, symbol_table, type):
+    def codegen(self, module, builder, symbol_table, type=List(BaseType.Int)):
         # expects the type of list to construct
         # a nullptr for the correct data_type
 
@@ -525,18 +525,33 @@ class NewArray(Expression):
 class isEmptyList(Expression):
     def __init__(self, expr):
         self.expr = expr
+        self.expr_type = None
 
     def sem(self, symbol_table):
         '''
             Checks that the given expression is a list.
         '''
         expr_type = self.expr.sem(symbol_table)
+        self.expr_type = expr_type
 
         if expr_type != BaseType.Nil and not isinstance(expr_type, List):
             errormsg = f'nil? expects a list as a parameter but a {expr_type} was given.'
             raise Exception(errormsg)
 
         return BaseType.Bool
+
+    def codegen(self, module, builder, symbol_table):
+        if isinstance(self.expr_type, BaseType) and self.expr_type == BaseType.Nil:
+            return ir.Constant(LLVM_Types.Bool, 1)
+
+        expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.expr, symbol_table):
+            expr_cvalue = builder.load(expr_cvalue)
+
+        null = ir.Constant(BaseType_to_LLVM(self.expr_type).as_pointer(), None)
+
+        return builder.icmp_unsigned('==', expr_cvalue, null)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}nil?\n'+\

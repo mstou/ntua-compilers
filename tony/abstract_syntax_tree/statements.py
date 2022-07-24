@@ -121,6 +121,10 @@ class IfStatement(Statement):
 
     def codegen(self, module, builder, symbol_table):
         cond = self.condition.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.condition, symbol_table):
+            cond = builder.load(cond)
+
         cmp  = builder.icmp_unsigned('!=', cond, ir.Constant(LLVM_Types.Bool, 0))
 
         then_bb  = builder.function.append_basic_block('then')
@@ -273,6 +277,10 @@ class IfElseStatement(Statement):
 
     def codegen(self, module, builder, symbol_table):
         cond = self.ifclause.condition.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.ifclause.condition, symbol_table):
+            cond = builder.load(cond)
+
         cmp  = builder.icmp_unsigned('!=', cond, ir.Constant(LLVM_Types.Bool, 0))
 
         then_bb  = builder.function.append_basic_block('then')
@@ -284,14 +292,14 @@ class IfElseStatement(Statement):
         builder.position_at_start(then_bb)
         for s in self.ifclause.statements:
             s.codegen(module, builder, symbol_table)
-        if not self.block.is_terminated: builder.branch(after_bb)
+        if not builder.block.is_terminated: builder.branch(after_bb)
 
         # Building the 'else' block
         builder.function.basic_blocks.append(else_bb)
         builder.position_at_start(else_bb)
         for s in self.else_clause.statements:
             s.codegen(module, builder, symbol_table)
-        if not self.block.is_terminated: builder.branch(after_bb)
+        if not builder.block.is_terminated: builder.branch(after_bb)
 
         builder.function.basic_blocks.append(after_bb)
         builder.position_at_start(after_bb)
@@ -326,6 +334,10 @@ class IfFullStatement(Statement):
     def codegen(self, module, builder, symbol_table):
         FALSE = ir.Constant(LLVM_Types.Bool, 0)
         cond = self.ifclause.condition.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.ifclause.condition, symbol_table):
+            cond = builder.load(cond)
+
         cmp  = builder.icmp_unsigned('!=', cond, FALSE)
 
         then_bb  = builder.function.append_basic_block('then')
@@ -351,6 +363,10 @@ class IfFullStatement(Statement):
             builder.function.basic_blocks.append(elsif_conds[i])
             builder.position_at_start(elsif_conds[i])
             cond = eif.condition.codegen(module, builder, symbol_table)
+
+            if should_load_or_store(eif.condition, symbol_table):
+                cond = builder.load(cond)
+
             cmp  = builder.icmp_unsigned('!=', cond, FALSE)
 
             if i == len(self.elsifs) - 1:
@@ -433,6 +449,10 @@ class ForLoop(Statement):
         builder.function.basic_blocks.append(loopcond)
         builder.position_at_start(loopcond)
         cond = self.condition.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.condition, symbol_table):
+            cond = builder.load(cond)
+
         cmp  = builder.icmp_unsigned('!=', cond, ir.Constant(LLVM_Types.Bool, 0))
         builder.cbranch(cmp, loopbody, afterloop)
 
@@ -555,6 +575,8 @@ class Assignment(Statement):
     def __init__(self, atom, expr):
         self.atom = atom
         self.expr = expr
+        self.atom_type = None
+        self.expr_type = None
 
     def sem(self, symbol_table):
         '''
@@ -564,12 +586,14 @@ class Assignment(Statement):
         '''
 
         expr_type = self.expr.sem(symbol_table)
+        self.expr_type = expr_type
 
         if not isinstance(self.atom, VarAtom) and not isinstance(self.atom, AtomArray):
             errormsg = f'The left-hand side of an assignment can only be a variable.'
             raise Exception(errormsg)
 
         var_type = self.atom.sem(symbol_table)
+        self.atom_type = var_type
 
         if var_type != expr_type:
             errormsg = f'Unsupported assignment between {var_type} and {expr_type}'
@@ -579,13 +603,16 @@ class Assignment(Statement):
 
     def codegen(self, module, builder, symbol_table):
         atom_cvalue = self.atom.codegen(module, builder, symbol_table) # performs a lookup and returns the cvalue
-        expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if isinstance(self.atom_type, List) and isinstance(self.expr_type, BaseType): # expr = Nil
+            expr_cvalue = self.expr.codegen(module, builder, symbol_table, type=self.atom_type)
+        else:
+            expr_cvalue = self.expr.codegen(module, builder, symbol_table)
 
         if should_load_or_store(self.expr, symbol_table):
             expr_cvalue = builder.load(expr_cvalue)
 
-        if should_load_or_store(self.atom, symbol_table):
-            builder.store(expr_cvalue, atom_cvalue)
+        builder.store(expr_cvalue, atom_cvalue)
 
         return None
 

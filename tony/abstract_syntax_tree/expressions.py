@@ -508,6 +508,10 @@ class NewArray(Expression):
 
     def codegen(self, module, builder, symbol_table):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.expr, symbol_table):
+            expr_cvalue = builder.load(expr_cvalue)
+
         return builder.alloca(self.llvm_array_type, expr_cvalue)
 
     def pprint(self, indent=0):

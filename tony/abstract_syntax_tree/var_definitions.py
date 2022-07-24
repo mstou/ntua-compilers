@@ -1,6 +1,8 @@
 from .node         import Node, indentation
 from .symbol_table import Variable
 from .llvm_types   import BaseType_to_LLVM
+from .data_types   import List
+
 from llvmlite import ir
 
 class VariableDefinition(Node):
@@ -17,6 +19,8 @@ class VariableDefinition(Node):
         '''
         type = self.type.sem(symbol_table)
         self.llvm_type = BaseType_to_LLVM(type)
+        if isinstance(type, List):
+            self.llvm_type = self.llvm_type.as_pointer()
 
         for name in self.names:
             if symbol_table.lookup_current_scope(name) != None:

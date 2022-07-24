@@ -7,10 +7,11 @@ from .atoms        import VarAtom
 from llvmlite import ir
 
 def should_load_or_store(expression, symbol_table):
-    # global variables and function params that
-    # are passed by reference must be loaded before used
+    # global variables, arrays, lists and function params that
+    # are passed by reference must be loaded before use
     # and stored after assignments
-    if isinstance(expression, AtomArray):
+
+    if isinstance(expression, AtomArray) or isinstance(expression, List):
         return True
 
     if not isinstance(expression, VarAtom):
@@ -320,7 +321,7 @@ class EmptyListNode(Expression):
         return BaseType.Nil
 
     def pprint(self, indent=0):
-        return f'{indentation(indent)}{BaseType.Void}'
+        return f'{indentation(indent)}{BaseType.Nil}'
 
     def codegen(self, module, builder, symbol_table, type):
         # expects the type of list to construct
@@ -544,7 +545,8 @@ class ListOperator(Expression):
     def __init__(self, left, right):
         self.head = left
         self.tail = right
-        self.head_type = None
+        self.list_type = None
+        self.tail_type = None
 
     def sem(self, symbol_table):
         '''
@@ -556,15 +558,44 @@ class ListOperator(Expression):
         head_type = self.head.sem(symbol_table)
         tail_type = self.tail.sem(symbol_table)
 
-        self.head_type = List(head_type)
+        self.list_type = List(head_type)
+        self.tail_type = tail_type
 
-        if tail_type != BaseType.Nil or tail_type != List(head_type):
-            errormsg = f'Incompatible types of head and tail. Expected' +\
+        if tail_type != BaseType.Nil and tail_type != List(head_type):
+            errormsg = f'Incompatible types of head and tail. Expected ' +\
                        f'{List(head_type)} but got {tail_type} instead.'
 
             raise Exception(errormsg)
 
         return List(head_type)
+
+    def codegen(self, module, builder, symbol_table):
+        one  = ir.Constant(LLVM_Types.Int, 1)
+        zero = ir.Constant(LLVM_Types.Int, 0)
+
+        head_c = self.head.codegen(module, builder, symbol_table)
+
+        if isinstance(self.tail_type, BaseType): # self.tail_type == BaseType.Nil
+            tail_c = self.tail.codegen(module, builder, symbol_table, type=self.list_type)
+        else:
+            tail_c = self.tail.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.head, symbol_table):
+            head_c = builder.load(head_c)
+
+        if should_load_or_store(self.tail, symbol_table):
+            tail_c = builder.load(tail_c)
+
+        list_node = BaseType_to_LLVM(self.list_type)
+        new_block = builder.alloca(list_node)
+
+        head_ptr = builder.gep(new_block, [zero, zero])
+        tail_ptr = builder.gep(new_block, [zero, one])
+
+        builder.store(head_c, head_ptr, align=1)
+        builder.store(tail_c, tail_ptr, align=1)
+
+        return new_block
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}new list with (head,tail):\n'+\
@@ -596,14 +627,18 @@ class TailOperator(Expression):
 
         return t
 
-
     def codegen(self, module, builder, symbol_table):
-        list_cvalue = self.expr.codegen(module, builder, symbol_table)
         # self.expr will not be Nil - guaranteed by the semantics check
         # however, it might be an atom that points to an empty list.
         # in that case it will crach during execution
+        list_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.expr, symbol_table):
+            list_cvalue = builder.load(list_cvalue)
+
         zero = ir.Constant(LLVM_Types.Int, 0)
         one  = ir.Constant(LLVM_Types.Int, 1)
+
         ptr_to_head = builder.gep(list_cvalue, [zero, one], inbounds=True)
         return builder.load(ptr_to_head)
 
@@ -637,11 +672,17 @@ class HeadOperator(Expression):
         return t.t # list subtype
 
     def codegen(self, module, builder, symbol_table):
-        list_cvalue = self.expr.codegen(module, builder, symbol_table)
         # self.expr will not be Nil - guaranteed by the semantics check
         # however, it might be an atom that points to an empty list.
         # in that case it will crach during execution
+
+        list_cvalue = self.expr.codegen(module, builder, symbol_table)
+
+        if should_load_or_store(self.expr, symbol_table):
+            list_cvalue = builder.load(list_cvalue)
+
         zero = ir.Constant(LLVM_Types.Int, 0)
+
         ptr_to_head = builder.gep(list_cvalue, [zero, zero], inbounds=True)
         return builder.load(ptr_to_head)
 

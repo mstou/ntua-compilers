@@ -534,7 +534,6 @@ class FunctionCall(Statement):
 
             params.append(val)
 
-
         return builder.call(func_cvalue, params)
 
     def pprint(self, indent=0):
@@ -582,7 +581,6 @@ class Assignment(Statement):
         atom_cvalue = self.atom.codegen(module, builder, symbol_table) # performs a lookup and returns the cvalue
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
 
-        entry = symbol_table.lookup(self.atom.name)
         if should_load_or_store(self.expr, symbol_table):
             expr_cvalue = builder.load(expr_cvalue)
 

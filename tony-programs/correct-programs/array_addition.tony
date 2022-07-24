@@ -1,0 +1,27 @@
+def main():
+    def array_addition(int[] A, int[] B, int n):
+        for i := 0; i < n; i := i + 1:
+            A[i] := A[i] + B[i]
+        end
+    end
+    
+    int [] A, B
+    int i, n
+
+    n := geti()
+    A := new int[n]
+    B := new int[n]
+    for i := 0; i < n; i := i + 1:
+        A[i] := geti()
+    end
+    for i := 0; i < n; i := i + 1:
+        B[i] := geti()
+    end
+
+    array_addition(A, B, n)
+
+    for i := 0; i < n; i := i + 1:
+        puti(A[i])
+        puts("\n")
+    end
+end

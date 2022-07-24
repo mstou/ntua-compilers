@@ -65,3 +65,20 @@ def test_is_palindrome():
     assert result.stdout.decode("utf-8") == expected_output
 
     os.remove('a.out')
+
+@pytest.mark.end2end
+def test_array_addition():
+    compile(CORRECT_PROGRAMS + 'array_addition.tony')
+
+    for i in range(1,3):
+        output_file = TEST_INPUTS + f'array_addition/output_{i}.txt'
+        input_file  = TEST_INPUTS + f'array_addition/input_{i}.txt'
+
+        result = subprocess.run(f'./a.out < {input_file}', shell=True, stdout=subprocess.PIPE)
+
+        with open(output_file, 'r') as f:
+            expected_output = f.read()
+
+        assert result.stdout.decode("utf-8") == expected_output
+
+    os.remove('a.out')

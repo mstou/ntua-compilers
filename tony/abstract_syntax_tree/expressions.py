@@ -596,6 +596,17 @@ class TailOperator(Expression):
 
         return t
 
+
+    def codegen(self, module, builder, symbol_table):
+        list_cvalue = self.expr.codegen(module, builder, symbol_table)
+        # self.expr will not be Nil - guaranteed by the semantics check
+        # however, it might be an atom that points to an empty list.
+        # in that case it will crach during execution
+        zero = ir.Constant(LLVM_Types.Int, 0)
+        one  = ir.Constant(LLVM_Types.Int, 1)
+        ptr_to_head = builder.gep(list_cvalue, [zero, one], inbounds=True)
+        return builder.load(ptr_to_head)
+
     def pprint(self, indent=0):
         return f'{indentation(indent)}tail of\n'+\
                self.expr.pprint(indent=indent+2)
@@ -624,6 +635,15 @@ class HeadOperator(Expression):
             raise Exception(errormsg)
 
         return t.t # list subtype
+
+    def codegen(self, module, builder, symbol_table):
+        list_cvalue = self.expr.codegen(module, builder, symbol_table)
+        # self.expr will not be Nil - guaranteed by the semantics check
+        # however, it might be an atom that points to an empty list.
+        # in that case it will crach during execution
+        zero = ir.Constant(LLVM_Types.Int, 0)
+        ptr_to_head = builder.gep(list_cvalue, [zero, zero], inbounds=True)
+        return builder.load(ptr_to_head)
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}head of\n'+\

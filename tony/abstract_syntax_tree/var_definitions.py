@@ -40,8 +40,8 @@ class VariableDefinition(Node):
 
         cvalues = []
         for name in self.names:
-            cvalue = ir.GlobalVariable(module, t, f'{name}_{symbol_table.get_id()}')
-            cvalue.initializer = ir.Constant(t, None)
+            cvalue = builder.alloca(t)
+            builder.store(ir.Constant(t, None), cvalue) # initializer
             cvalues.append(cvalue)
             symbol_table.insert(name, Variable(name, t, cvalue))
 

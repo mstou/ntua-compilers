@@ -351,6 +351,8 @@ class FunctionHeader(Node):
 
         self.actual_llvm_params = self.actual_llvm_params + self.extra_accesses
 
+        self.name_prefix = symbol_table.get_all_scope_names()
+
         if not decl:
             function_entry = symbol_table.lookup(self.function_name)
             if function_entry != None:
@@ -385,7 +387,7 @@ class FunctionHeader(Node):
             # begining the definition
 
             # we open a new scope in the symbol table
-            symbol_table.openScope()
+            symbol_table.openScope(name=self.function_name)
 
             # register all the arguments
             for i, arg in enumerate(func_cvalue.args):

@@ -40,7 +40,7 @@ class FunctionEntry(SymbolEntry):
         return s
 
 class Scope:
-    def __init__(self, func_name=None):
+    def __init__(self, func_name=''):
         self.locals = dict()
         self.func_name = func_name
         self.returned  = False
@@ -83,7 +83,7 @@ class SymbolTable:
             for f in self.builtins:
                 self.insert(f[0], FunctionEntry(f[0],f[1],f[2]))
 
-    def openScope(self, name=None):
+    def openScope(self, name=''):
         self.scopes.append(Scope(name))
 
     def closeScope(self):
@@ -133,7 +133,7 @@ class SymbolTable:
         return self.scopes[-1].func_name
 
     def get_all_scope_names(self):
-        return '_' + '_'.join(scope.func_name for scope in self.scopes)
+        return '_' + '_'.join([scope.func_name for scope in self.scopes])
 
     def get_global_accesses(self):
         return self.scopes[-1].accesses_outside

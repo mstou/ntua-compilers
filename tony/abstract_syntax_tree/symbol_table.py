@@ -44,6 +44,7 @@ class Scope:
         self.locals = dict()
         self.func_name = func_name
         self.returned  = False
+        self.accesses_outside = set()
 
     def lookup(self, s):
         if s in self.locals.keys():
@@ -60,6 +61,7 @@ class SymbolTable:
     def __init__(self, skip_builtins=False):
         self.scopes = []
         self.id = 0
+
         self.builtins = [
             ('puti', BaseType.Void, [('n', BaseType.Int, False)]),
             ('putb', BaseType.Void, [('b', BaseType.Bool, False)]),
@@ -85,6 +87,14 @@ class SymbolTable:
         self.scopes.append(Scope(name))
 
     def closeScope(self):
+        if len(self.scopes) > 1:
+            # we keep the accesses that were not from our scope
+            # as we will have to pass them down
+
+            for entry in self.scopes[-1].accesses_outside:
+                if entry.name not in self.scopes[-2].locals:
+                    self.scopes[-2].accesses_outside.add(entry)
+
         self.scopes.pop()
 
     def insert(self, s, t):
@@ -94,10 +104,22 @@ class SymbolTable:
         sc.insert(s, t)
 
     def lookup(self, s):
+        local_scope = True # this is true for the first iteration
+
         for sc in self.scopes[::-1]: # reverse
             name = sc.lookup(s)
+
             if name != None:
+                if not local_scope:
+                    is_var = isinstance(name, Variable)
+                    is_param = isinstance(name, FunctionParam)
+
+                    if  is_var or is_param:
+                        self.scopes[-1].accesses_outside.add(name)
+                        # register the use of a global variable
                 return name
+
+            local_scope = False
 
         return None
 
@@ -109,6 +131,12 @@ class SymbolTable:
 
     def get_scope_name(self):
         return self.scopes[-1].func_name
+
+    def get_all_scope_names(self):
+        return '_' + '_'.join(scope.func_name for scope in self.scopes)
+
+    def get_global_accesses(self):
+        return self.scopes[-1].accesses_outside
 
     def all_funcs_defined(self):
         ''' Checks if all functions that were declared

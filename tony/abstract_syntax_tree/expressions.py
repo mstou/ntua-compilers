@@ -7,22 +7,19 @@ from .atoms        import VarAtom
 from llvmlite import ir
 
 def should_load_or_store(expression, symbol_table):
-    # global variables, arrays and function params that
+    # global variables, arrays, lists and function params that
     # are passed by reference must be loaded before use
     # and stored after assignments
 
     if isinstance(expression, AtomArray):
+        # this refers to x[.] for which codegen returns the gep pointer
+        # and in order to get the value we must load from it.
         return True
 
     if not isinstance(expression, VarAtom):
         return False
 
-    # the expression is a variable
-    var_entry = symbol_table.lookup(expression.name)
-
-    if isinstance(var_entry, FunctionParam):
-        return var_entry.reference
-
+    # VarAtom captures all variables including arrays and lists.
     return True
 
 

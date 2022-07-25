@@ -1,5 +1,6 @@
 def main():
     def array_addition(int[] A, B; int n):
+
         for i := 0; i < n; i := i + 1:
             A[i] := A[i] + B[i]
         end

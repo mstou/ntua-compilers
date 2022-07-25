@@ -76,9 +76,7 @@ class ReturnStatement(Statement):
     def codegen(self, module, builder, symbol_table):
         expr_cvalue = self.expr.codegen(module, builder, symbol_table)
 
-        if isinstance(self.expr, VarAtom):
-            var_entry = symbol_table.lookup(self.expr.name)
-            if not isinstance(var_entry, FunctionParam):
+        if should_load_or_store(self.expr, symbol_table):
                 expr_cvalue = builder.load(expr_cvalue)
 
         return builder.ret(expr_cvalue)

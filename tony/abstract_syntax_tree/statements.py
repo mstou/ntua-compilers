@@ -545,6 +545,7 @@ class FunctionCall(Statement):
         params = []
 
         for e, exp_param in zip(self.expressions, function_entry.params):
+            # passing the normal parameters
             p = e.codegen(module, builder, symbol_table)
             val = p
             by_ref = exp_param[2]
@@ -553,6 +554,19 @@ class FunctionCall(Statement):
                 val = builder.load(p)
 
             params.append(val)
+
+        typical_params = len(self.expressions)
+
+        for p in function_entry.params[typical_params:]:
+            # passing the extra hidden llvm parameters
+            n, t, ref = p
+            entry = symbol_table.lookup(n)
+            cvalue = entry.cvalue
+
+            # the hidden params are all passed by reference, hence we should not
+            # load from the pointers
+
+            params.append(cvalue)
 
         return builder.call(func_cvalue, params)
 

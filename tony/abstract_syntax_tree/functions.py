@@ -56,6 +56,18 @@ class FuncDef(Node): # function definition
             errormsg = f'No return statement inside non-void function {self.header.function_name}'
             raise Exception(errormsg)
 
+        global_accesses = symbol_table.get_global_accesses()
+        extra_params = []
+
+        for entry in global_accesses:
+            name_ = entry.name
+            type_ = BaseType_to_LLVM(entry.type).as_pointer()
+            ref_ = True
+
+            extra_params.append((name_, type_, ref_))
+
+        self.header.extra_accesses = extra_params
+
         symbol_table.closeScope()
 
         return True
@@ -79,6 +91,9 @@ class FuncDef(Node): # function definition
             builder = ir.IRBuilder(entry_block)
 
         with builder.goto_block(entry_block):
+
+            self.allocate_parameters(builder, symbol_table)
+
             for v in self.vardefs:
                 v.codegen(module, builder, symbol_table)
 
@@ -90,7 +105,6 @@ class FuncDef(Node): # function definition
 
             for stmt in self.statements:
                 stmt.codegen(module, builder, symbol_table)
-                #TODO: check the return statement and add ret_void for void functions
 
             if self.header.return_type_llvm == BaseType_to_LLVM(BaseType.Void):
                 builder.ret_void()
@@ -102,6 +116,21 @@ class FuncDef(Node): # function definition
             symbol_table.closeScope()
 
         return func
+
+    def allocate_parameters(self, builder, symbol_table):
+        all_params = self.header.actual_llvm_params
+
+        for p in all_params:
+            n, t, ref = p
+            if ref: continue
+
+            entry = symbol_table.lookup(n)
+            old_cvalue = entry.cvalue
+
+            new_cvalue = builder.alloca(t)
+            builder.store(old_cvalue, new_cvalue)
+
+            entry.cvalue = new_cvalue
 
     def pprint(self, indent=0):
         s  = indentation(indent)
@@ -195,6 +224,9 @@ class FunctionHeader(Node):
 
         self.return_type_llvm = None
         self.param_types_llvm = []
+
+        self.extra_accesses = []
+        self.name_prefix = ''
 
     def sanitize(self, name):
         '''
@@ -312,6 +344,13 @@ class FunctionHeader(Node):
                 -> We open a new scope and insert all the parameters of the function
         '''
 
+        self.actual_llvm_params = []
+        for p, llvm_t in zip(self.params, self.param_types_llvm):
+            n, _, ref = p
+            self.actual_llvm_params.append((n,llvm_t,ref))
+
+        self.actual_llvm_params = self.actual_llvm_params + self.extra_accesses
+
         if not decl:
             function_entry = symbol_table.lookup(self.function_name)
             if function_entry != None:
@@ -321,17 +360,22 @@ class FunctionHeader(Node):
             # the function is about to be declared or about to be defined and was
             # not previously declared.
             # declare the function type and add it to the scope
-            parameters = self.param_types_llvm
+            parameters = [p[1] for p in self.actual_llvm_params] # llvm IR needs only the types
             ret_type   = self.return_type_llvm
             func_type = ir.FunctionType(ret_type, parameters)
-            llvm_name = 'main' if main else self.sanitize(self.function_name)
+
+            if main:
+                llvm_name = 'main'
+            else:
+                llvm_name = self.sanitize(f'{self.name_prefix}_{self.function_name}')
+
             func_cvalue = ir.Function(module, func_type, name=llvm_name)
 
             symbol_table.insert(self.function_name,
                 FunctionEntry(
                     self.function_name,
                     self.function_type,
-                    self.params,
+                    self.actual_llvm_params,
                     defined = not decl,
                     cvalue = func_cvalue
                 )
@@ -345,7 +389,7 @@ class FunctionHeader(Node):
 
             # register all the arguments
             for i, arg in enumerate(func_cvalue.args):
-                n, t, ref = self.params[i]
+                n, t, ref = self.actual_llvm_params[i]
                 cvalue = arg
                 symbol_table.insert(n, FunctionParam(n,t,ref,cvalue=cvalue))
 

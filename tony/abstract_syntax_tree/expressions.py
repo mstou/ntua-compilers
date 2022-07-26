@@ -509,7 +509,17 @@ class NewArray(Expression):
         if should_load_or_store(self.expr, symbol_table):
             expr_cvalue = builder.load(expr_cvalue)
 
-        return builder.alloca(self.llvm_array_type, expr_cvalue)
+        malloc_entry  = symbol_table.lookup('malloc')
+        malloc_cvalue = malloc_entry.cvalue
+
+        byte_size  = self.llvm_array_type.get_abi_size(symbol_table.getTargetData())
+        byte_sz_ir = ir.Constant(LLVM_Types.Int, byte_size)
+
+        size  = builder.mul(expr_cvalue, byte_sz_ir)
+        m_ptr = builder.call(malloc_cvalue, [size])
+        ptr   = builder.bitcast(m_ptr, self.llvm_array_type.as_pointer())
+
+        return ptr
 
     def pprint(self, indent=0):
         return f'{indentation(indent)}new array {self.type} of length\n'+\

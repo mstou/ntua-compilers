@@ -1,6 +1,6 @@
 from .data_types   import BaseType
 from .symbol_table import SymbolTable, FunctionEntry
-from .llvm_types   import BaseType_to_LLVM
+from .llvm_types   import BaseType_to_LLVM, LLVM_Types
 
 from llvmlite import ir, binding
 
@@ -55,6 +55,8 @@ class Program(Node):
 
         self.module = ir.Module()
         self.module.triple = self.binding.get_default_triple()
+        self.target_data = self.binding.Target.from_default_triple().create_target_machine().target_data
+        self.c_symbol_table.setTargetData(self.target_data)
 
         self.builder = None # the builder will be declared inside the function definition
 
@@ -69,6 +71,19 @@ class Program(Node):
                 args,
                 cvalue = func_cvalue
             ))
+
+        # register malloc
+        name = 'malloc'
+        type = LLVM_Types.Int.as_pointer()
+        args = [('t', LLVM_Types.Int, False)]
+        ftype = ir.FunctionType(type, [LLVM_Types.Int])
+        func_cvalue = ir.Function(self.module, ftype, name=name)
+        self.c_symbol_table.insert(name, FunctionEntry(
+            name,
+            type,
+            args,
+            cvalue = func_cvalue
+        ))
 
     def codegen(self):
         # pre-processing

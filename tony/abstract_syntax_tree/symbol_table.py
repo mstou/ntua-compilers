@@ -61,6 +61,7 @@ class SymbolTable:
     def __init__(self, skip_builtins=False):
         self.scopes = []
         self.id = 0
+        self.target_data = None
 
         self.builtins = [
             ('puti', BaseType.Void, [('n', BaseType.Int, False)]),
@@ -82,6 +83,12 @@ class SymbolTable:
         if not skip_builtins:
             for f in self.builtins:
                 self.insert(f[0], FunctionEntry(f[0],f[1],f[2]))
+
+    def setTargetData(self, t):
+        self.target_data = t
+
+    def getTargetData(self):
+        return self.target_data
 
     def openScope(self, name=''):
         self.scopes.append(Scope(name))

@@ -620,10 +620,17 @@ class ListOperator(Expression):
             tail_c = builder.load(tail_c)
 
         list_node = BaseType_to_LLVM(self.list_type)
-        new_block = builder.alloca(list_node)
 
-        head_ptr = builder.gep(new_block, [zero, zero])
-        tail_ptr = builder.gep(new_block, [zero, one])
+        malloc_entry  = symbol_table.lookup('malloc')
+        malloc_cvalue = malloc_entry.cvalue
+
+        byte_size  = list_node.get_abi_size(symbol_table.getTargetData())
+        byte_sz_ir = ir.Constant(LLVM_Types.Int, byte_size)
+        ptr = builder.call(malloc_cvalue, [byte_sz_ir])
+
+        new_block = builder.bitcast(ptr, list_node.as_pointer())
+        head_ptr  = builder.gep(new_block, [zero, zero])
+        tail_ptr  = builder.gep(new_block, [zero, one])
 
         builder.store(head_c, head_ptr, align=1)
         builder.store(tail_c, tail_ptr, align=1)

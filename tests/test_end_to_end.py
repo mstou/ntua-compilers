@@ -19,7 +19,24 @@ def test_array_addition():
         assert result.stdout.decode("utf-8") == expected_output
 
     os.remove('a.out')
-    
+
+@pytest.mark.end2end
+def test_array_addition_2d():
+    compile(CORRECT_PROGRAMS + 'array_addition_2d.tony')
+
+    for i in range(1,3):
+        output_file = TEST_INPUTS + f'array_addition_2d/output_{i}.txt'
+        input_file  = TEST_INPUTS + f'array_addition_2d/input_{i}.txt'
+
+        result = subprocess.run(f'./a.out < {input_file}', shell=True, stdout=subprocess.PIPE)
+
+        with open(output_file, 'r') as f:
+            expected_output = f.read()
+
+        assert result.stdout.decode("utf-8") == expected_output
+
+    os.remove('a.out')
+
 @pytest.mark.end2end
 def test_hello_world():
     compile(CORRECT_PROGRAMS + 'helloworld.tony')

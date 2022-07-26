@@ -1,0 +1,57 @@
+def main():
+  int n, m
+  int[][] A, B, C
+
+  def int[][] read2DMatrix(int n, m):
+    int i, j
+    int[][] A
+    A := new int[] [n]
+
+    for i := 0; i < n; i := i + 1:
+      A[i] := new int[m]
+      for j := 0; j < m; j := j + 1:
+        A[i][j] := geti()
+      end
+    end
+
+    return A
+  end
+
+  def print2DMatrix(int[][] A; int n, m):
+    int i, j
+
+    for i := 0; i < n; i := i + 1:
+      for j := 0; j < m; j := j + 1:
+        puti(A[i][j])
+
+        if j <> m-1: puts(" ")
+        else: puts("\n") end
+      end
+    end
+  end
+
+  def int[][] add2DMatrices(int[][] A, B; int n, m):
+    int i, j
+    int[][] C
+
+    C := new int[][n]
+    for i := 0; i < n; i := i + 1:
+      C[i] := new int[m]
+      for j := 0; j < m; j := j + 1:
+        C[i][j] := A[i][j] + B[i][j]
+      end
+    end
+    return C
+  end
+
+  n := geti()
+  m := geti()
+
+  A := read2DMatrix(n, m)
+  B := read2DMatrix(n, m)
+
+  C := add2DMatrices(A, B, n, m)
+
+  print2DMatrix(C, n, m)
+
+end

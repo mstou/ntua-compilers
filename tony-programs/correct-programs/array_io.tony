@@ -1,0 +1,33 @@
+def main():
+  def int[] readArray(int n):
+    int i
+    int[] x
+
+    x := new int[n]
+
+    for i := 0; i < n; i := i + 1:
+      x[i] := geti()
+    end
+
+    return x
+  end
+
+  def printArray(int[] x; int n):
+    int i
+
+    for i := 0; i < n; i := i + 1:
+      puti(x[i])
+      if i <> n-1: puts(" ")
+      else: puts("\n")
+      end
+    end
+  end
+
+  int[] x
+  int n
+
+  n:= 10
+  x := readArray(n)
+  printArray(x, n)
+
+end

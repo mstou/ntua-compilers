@@ -1,8 +1,2 @@
-
-24<37
-73<42
-
-
-dlrow olleH
+73>42
 Hello world
-

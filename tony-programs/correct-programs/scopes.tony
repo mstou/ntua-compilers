@@ -1,0 +1,20 @@
+def main():
+  int i
+
+  def f():
+    int x
+    def g(int y):
+      def h():
+        puti(y) puts("\n")
+        puti(x) puts("\n")
+      end
+      y := y+i
+      h()
+    end
+     x := 42
+     g(0)
+  end
+
+  i := 73
+  f()
+end

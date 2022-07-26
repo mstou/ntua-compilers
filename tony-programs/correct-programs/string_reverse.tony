@@ -5,19 +5,13 @@ def main():
     int i, l
 
     l := strlen(s)
-    puts(s)
-    puts("\n")
-
     t := new char[l+1]
     for i := 0; i < l; i := i + 1: t[i] := s[l-i-1] end
     t[i] := '\0'
 
-    puts(t)
-    puts("\n")
-
     return t
   end
 
-  reverse("\n24<37")
-  reverse("\ndlrow olleH")
+  puts(reverse("\n24>37"))
+  puts(reverse("\ndlrow olleH"))
 end

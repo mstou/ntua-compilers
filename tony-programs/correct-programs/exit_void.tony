@@ -1,0 +1,15 @@
+def main():
+  def f(ref int x):
+    x := 73
+    exit
+    x := 42
+  end
+
+  int x
+  x := 42
+  puti(x) puts("\n")
+  f(x)
+  puti(x) puts("\n")
+  exit
+  puts("Oops..\n")
+end

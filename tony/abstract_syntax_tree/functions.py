@@ -2,6 +2,7 @@ from .node         import Node, indentation
 from .symbol_table import *
 from .llvm_types   import BaseType_to_LLVM
 from .data_types   import List
+from .statements   import ExitStatement
 from llvmlite      import ir
 
 class FuncDef(Node): # function definition
@@ -105,6 +106,8 @@ class FuncDef(Node): # function definition
 
             for stmt in self.statements:
                 stmt.codegen(module, builder, symbol_table)
+                if isinstance(stmt, ExitStatement):
+                    break
 
             if self.header.return_type_llvm == BaseType_to_LLVM(BaseType.Void):
                 if not builder.block.is_terminated:

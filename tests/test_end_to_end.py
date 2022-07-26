@@ -70,6 +70,21 @@ def test_bubblesort():
     os.remove('a.out')
 
 @pytest.mark.end2end
+def test_exit_void():
+    compile(CORRECT_PROGRAMS + 'exit_void.tony')
+
+    result = subprocess.run('./a.out', shell=True, stdout=subprocess.PIPE)
+    output_file = TEST_INPUTS + 'exit_void/output_1.txt'
+    expected_output = ''
+
+    with open(output_file, 'r') as f:
+        expected_output = f.read()
+
+    assert result.stdout.decode("utf-8") == expected_output
+
+    os.remove('a.out')
+
+@pytest.mark.end2end
 def test_function_call():
     compile(CORRECT_PROGRAMS + 'function_call.tony')
 

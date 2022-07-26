@@ -16,7 +16,24 @@ class ExitStatement(Statement):
         pass
 
     def sem(self, symbol_table):
+        function_scope = symbol_table.get_scope_name()
+        entry = symbol_table.lookup(function_scope)
+
+        if function_scope == None or entry == None or not isinstance(entry, FunctionEntry):
+            errormsg = f'Return statement in wrong scope'
+            raise Exception(errormsg)
+
+        expected_type = entry.return_type
+
+        if entry.return_type != BaseType.Void:
+            errormsg = f'Exit statement in non-void function. Expected to '+\
+                       f'return a value of type {entry.return_type}'
+            raise Exception(errormsg)
+
         return True
+
+    def codegen(self, module, builder, symbol_table):
+        builder.ret_void()
 
     def pprint(self, indent=0):
         return indentation(indent) + f'Exit()'

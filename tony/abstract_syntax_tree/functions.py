@@ -107,7 +107,8 @@ class FuncDef(Node): # function definition
                 stmt.codegen(module, builder, symbol_table)
 
             if self.header.return_type_llvm == BaseType_to_LLVM(BaseType.Void):
-                builder.ret_void()
+                if not builder.block.is_terminated:
+                    builder.ret_void()
 
             elif len(builder.block.instructions) == 0:
                 # empty block and hence unreachable

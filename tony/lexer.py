@@ -144,7 +144,11 @@ def t_multicomment_symbols(t):
     r'.'
     pass
 
-t_multicomment_ignore = ' \t\n'
+t_multicomment_ignore = ' \t'
+
+def t_multicomment_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
 
 def t_multicomment_error(t):
     print('Comment Error...')

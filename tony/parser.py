@@ -341,7 +341,8 @@ def p_empty(p):
 
 #================= Error =================
 def p_error(p):
-    print('\x1b[0;30;41m' + 'Syntax error in input!' + '\x1b[0m')
+    errormsg = f'Syntax error in line {p.lineno}, unexpected token {p.value}'
+    raise Exception(errormsg)
 
 # Build the parser
 parser = yacc.yacc()

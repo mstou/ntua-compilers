@@ -39,4 +39,6 @@ def test_string_reverse():
 
 @pytest.mark.parser
 def test_random_input():
-    assert parser.parse('lol') == None
+
+    with pytest.raises(Exception):
+        parser.parse('lol')

@@ -18,9 +18,7 @@ class VariableDefinition(Node):
             2) Inserts the variable to the current scope
         '''
         type = self.type.sem(symbol_table)
-        self.llvm_type = BaseType_to_LLVM(type)
-        if isinstance(type, List):
-            self.llvm_type = self.llvm_type.as_pointer()
+        self.llvm_type = BaseType_to_LLVM(type, var_definition=True)
 
         for name in self.names:
             if symbol_table.lookup_current_scope(name) != None:

@@ -14,7 +14,7 @@ class LLVM_Types():
     Void = ir.VoidType()
 
 
-def BaseType_to_LLVM(type):
+def BaseType_to_LLVM(type, var_definition=False):
     if type == BaseType.Int:
         return LLVM_Types.Int
     if type == BaseType.Bool:
@@ -25,10 +25,13 @@ def BaseType_to_LLVM(type):
         return LLVM_Types.Void
 
     if isinstance(type, Array):
-        return BaseType_to_LLVM(type.t).as_pointer()
+        return BaseType_to_LLVM(type.t, var_definition).as_pointer()
 
     if isinstance(type, List):
-        return LLVM_List(type.t)
+        if not var_definition:
+            return LLVM_List(type.t)
+        else:
+            return LLVM_List(type.t).as_pointer()
 
     return None
 

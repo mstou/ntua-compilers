@@ -62,7 +62,7 @@ class FuncDef(Node): # function definition
 
         for entry in global_accesses:
             name_ = entry.name
-            type_ = BaseType_to_LLVM(entry.type).as_pointer()
+            type_ = BaseType_to_LLVM(entry.type, var_definition = True).as_pointer()
             ref_ = True
 
             extra_params.append((name_, type_, ref_))
@@ -279,16 +279,14 @@ class FunctionHeader(Node):
             type = t.sem(symbol_table) # calculate the actual type
             parameters.append((name,type,ref))
 
-            llvm_type = BaseType_to_LLVM(type)
-            if ref or isinstance(type, List):
+            llvm_type = BaseType_to_LLVM(type, var_definition = True)
+            if ref:
                 llvm_type = llvm_type.as_pointer()
 
             self.param_types_llvm.append(llvm_type)
 
         return_type = self.function_type.sem(symbol_table)
-        self.return_type_llvm = BaseType_to_LLVM(return_type)
-        if isinstance(return_type, List):
-            self.return_type_llvm = self.return_type_llvm.as_pointer()
+        self.return_type_llvm = BaseType_to_LLVM(return_type, var_definition = True)
 
         entry = symbol_table.lookup(self.function_name)
         if decl:

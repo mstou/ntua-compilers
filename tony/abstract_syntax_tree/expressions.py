@@ -500,7 +500,7 @@ class NewArray(Expression):
             raise Exception(errormsg)
 
         type = self.type.sem(symbol_table)
-        self.llvm_array_type = BaseType_to_LLVM(type)
+        self.llvm_array_type = BaseType_to_LLVM(type, var_definition = True)
         return Array(type)
 
     def codegen(self, module, builder, symbol_table):

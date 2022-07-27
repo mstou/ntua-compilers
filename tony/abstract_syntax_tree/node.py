@@ -85,7 +85,7 @@ class Program(Node):
             cvalue = func_cvalue
         ))
 
-    def codegen(self):
+    def codegen(self, opt_level=1):
         # pre-processing
         self.codegen_init()
 
@@ -95,7 +95,37 @@ class Program(Node):
         self.module = self.binding.parse_assembly(str(self.module))
         self.module.verify()
 
+        self.optimize_module(level=opt_level)
+
         return self.module
+
+
+    def optimize_module(self, level=1):
+        if level == 0:
+            return
+
+        # Initialize pass manager builder
+        pmb = self.binding.PassManagerBuilder()
+
+        # Declare optimization level
+        pmb.opt_level = level
+
+        # Run local optimizations on functions
+        fpm = self.binding.FunctionPassManager(self.module)
+        pmb.populate(fpm)
+        fpm.initialize()
+
+        for func in self.module.functions:
+            fpm.run(func)
+
+        fpm.finalize()
+
+        # Configure module pass manager
+        mpm = binding.ModulePassManager()
+        pmb.populate(mpm)
+
+        # Run GLOBAL optimizations on the module
+        mpm.run(self.module)
 
     def sem(self, symbol_table):
         '''

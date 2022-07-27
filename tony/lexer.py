@@ -162,24 +162,3 @@ def t_error(t):
 
 # Build the lexer
 lexer = lex.lex() # Use parameter debug=1 to debug
-
-# input = '''
-#         def hello ():
-#           puts("Hello world!\n")
-#         end
-#         '''
-# print(input)
-# file = sys.argv[1]
-# print(file)
-#
-# with open(file, 'r', encoding='unicode_escape') as f:
-#     s = f.read()
-#
-# lexer.input(s)
-#
-# # Tokenize
-# while True:
-#     tok = lexer.token()
-#     if not tok:
-#         break
-#     print((tok.type, tok.value))

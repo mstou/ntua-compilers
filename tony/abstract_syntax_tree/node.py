@@ -141,12 +141,3 @@ def indentation(indent):
     s += '|-- '
 
     return s
-#======== Map function =======
-def mapTree(node, f):
-    newType = node.type
-    newValue = f(node.value)
-    newChildren = []
-    for child in node.children:
-        newChildren.append(mapTree(child, f))
-
-    return Node(newType, newValue, newChildren)

@@ -1,0 +1,67 @@
+def main():
+
+  def list[int][] readGraph(int n, m):
+    int i
+    int u,v
+    list[int][] adj
+
+    adj := new list[int][n]
+
+    for i := 0; i < m; i := i + 1:
+      u := geti()                  % reading the pair
+      v := geti()                  % of nodes
+
+      adj[u] := v # adj[u]         % adding v to u's neighbors
+      adj[v] := u # adj[v]         % adding u to v's neighbors
+    end
+
+    return adj
+  end
+
+  def int dfs(int u):
+
+    <* Visits the neighbors that are not marked visited
+       and returns the size of the connected component
+       to which u belongs.
+    *>
+
+    list[int] l
+    int count, v
+
+    count := 1
+    visited[u] := true
+
+    for l := adj[u]; not nil?(l); l := tail(l):
+      v := head(l)
+
+      if not visited[v]:
+        count := count + dfs(v)
+      end
+    end
+
+    return count
+
+  end
+
+  int n, m, i
+  bool[] visited
+  list[int][] adj
+
+  n := geti()
+  m := geti()
+
+  adj := readGraph(n, m)
+
+  visited := new bool[n]
+
+  for i := 0; i < n; i := i + 1:
+    visited[i] := false
+  end
+
+  if dfs(0) <> n:
+    puts("The graph is disconnected\n")
+  else:
+    puts("The graph is connected\n")
+  end
+
+end

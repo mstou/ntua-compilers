@@ -70,6 +70,23 @@ def test_bubblesort():
     os.remove('a.out')
 
 @pytest.mark.end2end
+def test_dfs():
+    compile(CORRECT_PROGRAMS + 'dfs.tony')
+
+    for i in range(1,5):
+        output_file = TEST_INPUTS + f'dfs/output_{i}.txt'
+        input_file  = TEST_INPUTS + f'dfs/input_{i}.txt'
+
+        result = subprocess.run(f'./a.out < {input_file}', shell=True, stdout=subprocess.PIPE)
+
+        with open(output_file, 'r') as f:
+            expected_output = f.read()
+
+        assert result.stdout.decode("utf-8") == expected_output
+
+    os.remove('a.out')
+
+@pytest.mark.end2end
 def test_exit_void():
     compile(CORRECT_PROGRAMS + 'exit_void.tony')
 

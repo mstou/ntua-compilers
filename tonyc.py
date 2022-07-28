@@ -18,6 +18,7 @@ def compile(file,
             print_ast=False,
             show_commands=True,
             optimization=1,
+            exec_name=None,
             testing=False):
 
     if BUILTINS_LIB not in os.listdir():
@@ -25,6 +26,10 @@ def compile(file,
         os.system(cmd_make_builtins)
 
         if show_commands: print(cmd_make_builtins)
+
+    if exec_name != None:
+        testing = True
+        # we use the testing mode to clear the intermediate files
 
     ''' Reading the code '''
     if file == None:
@@ -86,6 +91,9 @@ def compile(file,
 
     ''' Making the final executable '''
     executable = 'a.out' if testing else f'{file_prefix}.out'
+    if exec_name != None:
+        executable = exec_name
+
     cmd_gcc = f'gcc {as_output} -L . -Wl,-rpath={os.getcwd()} -lbuiltins -o {executable}'
     os.system(cmd_gcc)
     if show_commands: print(cmd_gcc)
@@ -107,6 +115,7 @@ if __name__ == '__main__':
     argparser.add_argument('-O3', action='store_true')
     argparser.add_argument('--commands', action='store_true')
     argparser.add_argument('--ast', action='store_true')
+    argparser.add_argument('-o', type=str)
 
 
     args = argparser.parse_args()
@@ -126,6 +135,7 @@ if __name__ == '__main__':
         print('Please specify at most one of the arguments -f and -i')
         exit()
 
+    exec_name = args.o if args.o else None
 
     compile(
         file,
@@ -133,4 +143,5 @@ if __name__ == '__main__':
         llvm_to_stdout=args.i,
         as_to_stdout=args.f,
         print_ast=args.ast,
+        exec_name=exec_name,
         optimization=optimization)

@@ -18,6 +18,14 @@ You can check the [language reference](tony2020.pdf) (in Greek) for more details
 [Palindrome Testing](tests/tony-programs/correct-programs/is_palindrome.tony) etc.)
 
 
+## Contents
+
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Example](#example)
+* [Software Architecture](#software-architecture)
+* [Tests](#tests)
+
 ## Installation
 
 To use the Tony Compiler you should have `llvm-11`, `gcc`
@@ -154,7 +162,7 @@ main_entry:
 
 To print the Assembly code for our machine in `stdout` we would use `-f`:
 
-```x86_64
+```assembly
 $ ./tonyc.py -f < example.tony
 
 .text
@@ -189,9 +197,7 @@ str_literal_1:
 
 ```
 
-
-
-## Architecture
+## Software Architecture
 
 ## Tests
 

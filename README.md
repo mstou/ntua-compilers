@@ -199,6 +199,8 @@ str_literal_1:
 
 ## Software Architecture
 
+![alt text](arch.png)
+
 ## Tests
 
 To run all the tests simply run

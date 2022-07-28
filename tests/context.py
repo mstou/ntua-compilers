@@ -6,7 +6,7 @@ from tony  import *
 from tonyc import compile
 
 TEST_INPUTS = 'tests/test-inputs/'
-PROGRAMS_PREFIX  = 'tony-programs/'
+PROGRAMS_PREFIX  = 'tests/tony-programs/'
 SEMANTICS_TESTS  = PROGRAMS_PREFIX + 'incorrect-semantics/'
 CORRECT_PROGRAMS = PROGRAMS_PREFIX + 'correct-programs/'
 
